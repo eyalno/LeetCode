@@ -1621,8 +1621,8 @@ return {};
       //avoid duplicates combination by that 
       for (int i = 0; i < size - 2; i++   ){ //last 2 dont count
             if (i > 0 && nums[i] == nums[i-1]) continue;  //fix a number and skip duplicated after
-            // i = i+1 wont work  
-            
+            // i = i+1 wont work since you want to fix a num for i but j can be the same number but not i again    
+            //so we want to fix the number first.
             int target = -nums[i];
 
             int start = i + 1;
@@ -1665,7 +1665,7 @@ return res;
             if (i > 0 && nums[i] == nums[i-1]) continue;  //fix a number and skip duplicated after
             // i = i+1 wont work  
             
-            for (int j = i+1; j < size -1; j++){ // size -1 since k should be after
+            for (int j = i + 1; j < size - 1; j++){ // size -1 since k should be after
                   if ( (j> i+1) && nums[j] == nums[j-1]) continue;  //skip duplicated
 
                   int start = j + 1;
@@ -1698,32 +1698,92 @@ return res;
       //sort vector
       int size = nums.size();
       sort(nums.begin(),nums.end());
-      unordered_set<int> set;
-
+      
       // since the aray sorted we can only search the nums right to i we 
       //avoid duplicates combination by that 
       
       for (int i = 0; i < size - 2; i++   ){ //last 2 dont count
+            unordered_set<int> set;
             if (i > 0 && nums[i] == nums[i-1]) continue;  //fix a number and skip duplicated after
-            // i = i+1 wont work  
             
-            for (int j = i+1; j < size ; j++){
-                  if ( (j> i+1) && nums[j] == nums[j-1]) continue; 
+            for (int j = i+1; j < size ; j++){  // k could be before or after j
 
                   int complement = -(nums[i]  + nums[j]);
 
                   if (set.find(complement) != set.end()){
-                         res.push_back({nums[i],nums[j],complement});
-                        while (j < size && nums[j] == nums[j-1] ) j++;
+                        res.push_back({nums[i],nums[j],complement});
+                         while (j + 1 < size && nums[j] == nums[j+1] ) j++;  // j+1 means k ,  
                   }
                   
-                  set.insert(nums[j]);
+                  set.insert(nums[j]); // add any j since it can be a complement 
              }  
       }
       return res;
       // fixed number and sum 2 problem hashmap/  
  }
 
+//Brute Force
+int maxAreaBruteForce(vector<int>& height) {
+
+      int max = 0;
+      int size = height.size();
+
+      for (int i = 0; i < size -1; i++ ){
+            for (int j = i + 1;  j <  size; j++ ){
+                  max = std::max(max, (j-i) * (std::min(height[i],height[j])))   ;
+
+            }
+      }
+return max;
+}
+
+int maxAreaTwoPointers(vector<int>& height) {
+
+      //moving the shorter line inward
+      //by doing that we skip all permutuations that are not relevant since the shorter line always 
+      //dominates the size of the container. 
+      int max = 0;
+      int size = height.size();
+
+      int i = 0 , j = size -1;
+      while ( i < j ){
+            
+            max = std::max(max, (j-i) * (std::min(height[i],height[j])));
+            if( height[i] > height[j])
+                  j--;
+            else 
+                  i++;
+      }
+return max;
+      
+
+}
+
+//Sliding window
+
+double findMaxAverage(vector<int>& nums, int k) {
+
+       int size = nums.size();
+      
+      double windowSum = 0.0;
+
+      for (int i = 0; i < k; i++ )
+            windowSum += nums[i];
+      double max = windowSum;
+
+      for (int i = 1; i <= size - k; i++){
+            
+            windowSum += (-(nums[i-1]) + nums[i+k-1] );
+
+            max =std::max(windowSum,max);
+      }
+      return max/ k;
+}
+
+int lengthOfLongestSubstring(string s) {
+
+
+}
 
 
 };
@@ -6377,6 +6437,16 @@ groupAnagrams(anagrams);
 //isPalindrome("");
 //firstUniqChar("loveleetcode");
 //vector<int> binaryVector= {-1,0,3,5,9,12} ;
+
+while (true){
+
+unordered_set<int> set;
+
+set.insert(1);
+set.insert(2);
+
+}
+
 
 bool ret =  backspaceCompare("y#fo##f","y#fo##f");
 
