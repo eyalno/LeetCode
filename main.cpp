@@ -28,6 +28,17 @@ struct TreeNode {
      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+
+struct ListNode {
+          
+      int val;
+      ListNode *next;
+      ListNode() : val(0), next(nullptr) {}
+      ListNode(int x) : val(x), next(nullptr) {}
+      ListNode(int x, ListNode *next) : val(x), next(next) {}
+ };
+
+
 vector<int>  sortedSquares(vector<int>& nums);
 vector<int>  sortedSquaresV2(vector<int>& nums);
 vector<int>  sortArrayByParity(vector<int>& nums);
@@ -1780,9 +1791,191 @@ double findMaxAverage(vector<int>& nums, int k) {
       return max/ k;
 }
 
+//BruteForce
+int lengthOfLongestSubstringBF(string s) {
+
+      if (s.empty())
+            return 0;
+      
+      int size = s.size();
+
+      if (size == 1)
+            return 1;
+
+      int maxLen = 0;
+      // maximum length until a duplicate is found
+      for (int i = 0 ; i < size; i++){
+            unordered_set<char> seen; //reset for every i
+            int currLen = 0;
+            
+            for (int j = i  ; j < size ; j++){
+                  
+                  if (seen.find(s[j]) != seen.end()  )
+                        break;      //duplicate found; 
+                  currLen++;
+                  seen.insert(s[j]);
+            }
+
+            maxLen =  std::max(maxLen, currLen);
+      }
+      return maxLen;
+}
+//sliding window approach saves from recounting the length
 int lengthOfLongestSubstring(string s) {
 
+      if (s.empty())
+            return 0;
+      
+      int size = s.size();
 
+      if (size == 1)
+            return 1;
+
+      int maxLen = 0;
+      // maximum length until a duplicate is found
+      
+      unordered_map<char,int> prevLoc; // Map to store the last seen index of each character
+      int currLen = 0;
+      int start = 0 ;
+      // the end is progressing the start jums between duplicates (windows)
+      for (int end = 0 ; end  < size; end ++ ){
+            char currCh = s[end];
+
+             // If the character is already seen and within the current window
+            if (prevLoc.find(currCh) != prevLoc.end() && prevLoc[currCh] >= start ){
+                  start = prevLoc[currCh] +1; //Move the start to the right of the duplicate
+            }
+
+            // Update the last seen index of the current character
+            prevLoc[currCh] = end;
+      
+            maxLen =  std::max(maxLen, end - start +1);
+      }
+      return maxLen;
+}
+
+
+
+
+//4. Fast and slow pointers array/Linked List
+
+bool hasCycle(ListNode *head){
+
+      ListNode * slow = head;
+      ListNode * fast = head;
+
+      while (fast  &&   fast->next  ){ // if null we know not a cycle also this is the step .
+            
+            slow = slow-> next;
+            fast = fast->next->next;
+            
+            if (fast == slow)
+                  return true;
+      }
+
+      return false;
+
+}
+
+
+
+//hash set
+bool hasCycleSet(ListNode *head) {
+      unordered_set<ListNode *> set;
+
+      ListNode * curr = head;
+
+      while (curr != NULL){
+            if (set.find(curr) != set.end())
+                  return true;
+            
+            set.insert(curr);
+            curr = curr->next;
+      }
+
+      return false;
+}
+
+
+
+bool isHappy(int n) {
+      unordered_set<int> set; 
+      
+      while (1){
+            int sum;
+            sum =0;
+            
+            while( n){
+                  int digit = n%10;
+                  n/=10;
+                  sum +=(pow(digit,2));
+            }
+            
+            n = sum;
+            if (sum == 1  )
+                  return true;
+            else if (set.find(sum) != set.end() )
+                        return false;
+                  else
+                        set.insert(sum);
+      }
+}     
+ 
+/* 
+ int findDuplicate(vector<int>& nums) {
+
+      int n =  nums.size();
+ }
+*/
+
+ int removeDuplicates(vector<int>& nums) {
+
+            
+            //{0,0,1,1,1,2,2,3,3,4};
+              int insertIndex = 1;
+
+    for (int i = 1; i < nums.size(); i++) {
+        if (nums[i] != nums[i - 1]) {
+            nums[insertIndex] = nums[i];
+            insertIndex++;
+        }
+    }
+    return insertIndex; // This directly gives the new length
+}
+
+ ListNode* reverseBetween(ListNode* head, int left, int right) {
+
+      return head;
+ }
+
+ ListNode* swapPairs(ListNode* head) {
+  
+      return head;     
+ }
+
+//6. Monotonic(increasing /decreasing)  Stack
+vector<int> nextGreaterElement(vector<int>& nums1, vector<int>& nums2) {
+
+
+      return {};
+}
+
+
+
+
+//7. K largest  /k smallest /most frequent 
+int findKthLargest(vector<int>& nums, int k) {
+
+      int size = nums.size();
+
+      priority_queue<int,vector<int>,greater<int>> minHeap;
+
+      for (int num : nums) {
+            minHeap.push(num); // Add the current number to the heap
+            if (minHeap.size() > k) 
+                  minHeap.pop(); // Remove the smallest element if size exceeds k
+      }
+      return minHeap.top();
 }
 
 
@@ -1952,15 +2145,6 @@ vector<vector<int>> levelOrder(TreeNode* root) {
 
 };
 
-
-struct ListNode {
-          
-      int val;
-      ListNode *next;
-      ListNode() : val(0), next(nullptr) {}
-      ListNode(int x) : val(x), next(nullptr) {}
-      ListNode(int x, ListNode *next) : val(x), next(next) {}
- };
 
 
 ListNode* middleNodeHelper(ListNode* slow , ListNode * fast) {
@@ -3178,37 +3362,6 @@ return ret;
 
 
 
-bool isHappy(int n) {
-
-
-unordered_set<int> set; 
-      
-      while (1){
-            int sum;
-            sum =0;
-            while( n){
-                  int digit = n%10;
-                  n/=10;
-                  sum +=(pow(digit,2));
-
-
-            }
-            n = sum;
-            if (sum ==1  )
-                  return true;
-            else if (set.find(sum) != set.end() )
-                  return false;
-                  else
-                        set.insert(sum);
-      }
-
-
-      
-
-
-
-
-}
 
 
 vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
@@ -4281,44 +4434,6 @@ ListNode * getIntersectionNode(ListNode *headA, ListNode *headB) {
 
 
 
-bool hasCycle(ListNode *head) {
-
-//hash set
-
-      unordered_set<ListNode *> set;
-
-      ListNode * curr = head;
-
-      while (curr != NULL){
-
-            if (set.find(curr) != set.end())
-                  return true;
-            
-            set.insert(curr);
-
-            curr = curr->next;
-      }
-
-return false;
-
-
-//slow fast pointers
-/*
-      ListNode * slow =head;
-      ListNode * fast =head;
-
-      while  (fast != NULL && fast->next != NULL){
-            
-            slow = slow->next;
-            fast = fast->next->next; 
-            if(slow == fast)
-                  return true;
-
-      }
-
-return false;
-*/
-}
 
 
 
