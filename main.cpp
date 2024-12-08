@@ -1978,8 +1978,224 @@ int findKthLargest(vector<int>& nums, int k) {
       return minHeap.top();
 }
 
+vector<int> topKFrequent(vector<int>& nums, int k) {
+
+      unordered_map<int,int> freqMap;
+      vector<int> result;
+      for (int num:nums) 
+            freqMap[num]++;
+
+      priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> minHeap;
+
+      for (const auto & pair :freqMap){
+
+            int num = pair.first;
+            int freq = pair.second;
+
+            minHeap.push({freq,num});
+            if (minHeap.size() > k)
+                  minHeap.pop();
+      }
+
+      while(!minHeap.empty()){
+
+            result.push_back(minHeap.top().second);
+            minHeap.pop();
+      }
+
+      return result;
+}
+
+vector<int> topKFrequentBucketSort(vector<int>& nums, int k) {
+
+      vector<int> result;
+      unordered_map<int,int> freqMap;
+      int size = nums.size();
+
+      for (int num:nums)
+            freqMap[num]++;
+
+      vector<vector<int>> buckets(size+1);  //  that is the maximum freq if all were the same number
+
+      for (const auto & pair:freqMap){
+            int num =  pair.first;
+            int freq =  pair.second;
+            buckets[freq].push_back(num);
+      }
+
+
+      for (int i = size; size > 0 && k > result.size(); i--   )
+            for (int num:buckets[i]){
+                  
+                  result.push_back(num);
+                  if (result.size() == k)
+                        break;
+            }
+      return result;
+}
+
+ vector<vector<int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k) {
+ 
+      vector<vector<int>> result;
+
+      struct heapStruct {
+            int sum;       // Task priority (lower value = higher priority)
+            int x;
+            int y;
+            heapStruct(int x, int y) : x(x), y(y),sum(x+y) {}
+      };
+      
+      struct compareHeap{
+            bool operator()(const  heapStruct & h1,const  heapStruct & h2 ){
+                  return h1.sum < h2.sum;
+            }
+      };
+
+      priority_queue<heapStruct,vector<heapStruct>,compareHeap> maxHeap; 
+
+      for (int x:nums1)
+            for (int y:nums2){
+                  heapStruct h(x,y);
+                  maxHeap.push(h);
+
+                  if (maxHeap.size() > k  )
+                        maxHeap.pop();
+            }
+      
+      
+      while(!maxHeap.empty()){
+            heapStruct h = maxHeap.top();
+            result.push_back({h.x,h.y});      
+            maxHeap.pop();
+            
+      }
+       reverse(result.begin(), result.end());
+      return result;
+
+ }    
+
+vector<vector<int>> kSmallestPairsEfficent(vector<int>& nums1, vector<int>& nums2, int k) {
+      
+
+      vector<vector<int>> result;
+
+      int m = nums1.size();
+      int n = nums2.size();
+
+      set<pair<int,int>> visited;
+
+      priority_queue<pair<int,pair<int,int>>,vector<pair<int,pair<int,int>>>,greater<pair<int,pair<int,int>>> > minHeap;
+
+      minHeap.push({ nums1[0] + nums2[0] ,{0,0} } );
+      visited.insert({0,0});
+      
+      while (k-- > 0 && !minHeap.empty()   ){
+
+            auto top =  minHeap.top();
+            minHeap.pop();
+            
+            int i = top.second.first; 
+            int j = top.second.second;
+            result.push_back({nums1[i], nums2[j]});
+
+            if ( i +1 < m && visited.find({i+1,j}) == visited.end()){
+                  minHeap.push({ nums1[i+1] + nums2[j] ,{i+1,j} });
+                  visited.insert({i+1,j});
+            }
+
+
+            if ( j +1 < n && visited.find({i,j+1}) == visited.end()){
+                  minHeap.push({ nums1[i] + nums2[j+1] ,{i,j+1} });
+                  visited.insert({i,j+1});
+            }
+      }
+ return result;     
+}
+
+
+static bool compareIntervals(const vector<int>  & a , const vector<int> & b ){
+      return a[0] < b[0];
+}
+
+//Overlapping Intervals
+vector<vector<int>> merge(vector<vector<int>>& intervals) {
+
+//Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+//Output: [[1,6],[8,10],[15,18]]
+
+      vector<vector<int>> res;
+      sort(intervals.begin(),intervals.end(),compareIntervals);
+
+      res.push_back(intervals[0]);
+
+      for (int i = 1; i < intervals.size() ; i ++ ){
+
+            auto & last =  res.back();  
+            if (intervals[i][0] <= last[1]  )
+                 last[1] = max(intervals[i][1],last[1]);
+            else     
+                  res.push_back(intervals[i]);
+             
+      }
+
+      return res;
+}
+
+
+ vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+
+      //Input: intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+      //Output: [[1,2],[3,10],[12,16]]
+      vector<vector<int>> merged;
+
+      if (newInterval.empty())
+            return merged;
+
+      if (intervals.empty() ){
+            merged.push_back(newInterval);
+            return merged;   
+      }
+      
+      
+      int left = 0 ;
+      int right = intervals.size() - 1;  
+      int newStart = newInterval[0];
+
+      while (left <= right){
+            int mid = left + (right - left)/2;
+
+            auto & interval = intervals[mid];
+
+      }
+
+
+      return merged;
+
+ }
+
+
+//10. Binary Tree Traversal
+
+vector<string> binaryTreePaths(TreeNode* root) {
+
+//Input: root = [1,2,3,null,5]
+//Output: ["1->2->5","1->3"]
+
+
+
+}
+
+
+
 
 };
+
+
+
+
+
+
+
 
 class PatternsToSolveLeetCode8 {
 
@@ -6553,17 +6769,6 @@ groupAnagrams(anagrams);
 //firstUniqChar("loveleetcode");
 //vector<int> binaryVector= {-1,0,3,5,9,12} ;
 
-while (true){
-
-unordered_set<int> set;
-
-set.insert(1);
-set.insert(2);
-
-}
-
-
-bool ret =  backspaceCompare("y#fo##f","y#fo##f");
 
 
 
