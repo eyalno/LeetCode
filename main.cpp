@@ -2618,10 +2618,41 @@ int longest_increasing_path(const vector<vector<int>>& matrix) {
 
 //Shortest Transformation Sequence
 int shortestTransformationSequence(string start, string end, vector<string>& dictionary) {
+      // Convert dictionary to a set for O(1) lookup
+      unordered_set<string> wordSet(dictionary.begin(),dictionary.end());
       
-      //
+      if (wordSet.find(end) == wordSet.end())
+            return -1;
+
+      queue<pair<string,int>> queue;
+
+      queue.push({start,1});
+
+      while(!queue.empty()) {
+
+            auto [currentWord,steps] = queue.front();
+            queue.pop();
+
+            if (currentWord == end)
+                  return steps;
+
+            // Try changing each character in the current word and search it
+            for (int i = 0; i < currentWord.length(); ++i ){
+                  string tempWord = currentWord;
+                  for (char ch = 'a'; ch <= 'z'; ch++ ){
+                        tempWord[i] = ch;
+
+                        if (wordSet.find(tempWord) != wordSet.end()){
+                              queue.push({tempWord,steps +1});
+                              wordSet.erase(tempWord);// Remove to prevent revisiting
+                        }
+                  }
+            }
+      }
 
 
+
+      return -1;
 
 }
 
