@@ -2659,7 +2659,85 @@ int shortestTransformationSequence(string start, string end, vector<string>& dic
 
 };
 
+class SocialNetwork{
+private:
+    // A map of user name to their friends (set ensures no duplicate friends)
+    unordered_map<string, unordered_set<string>> network;
 
+public:
+    // Add a new user to the network
+    void addUser(const string& user) {
+        if (network.find(user) == network.end()) {
+            network[user] = unordered_set<string>();
+            cout << user << " added to the network.\n";
+        } else {
+            cout << user << " already exists in the network.\n";
+        }
+    }
+
+    // Add a friendship between two users
+    void addFriendship(const string& user1, const string& user2) {
+        if (network.find(user1) == network.end() || network.find(user2) == network.end()) {
+            cout << "Both users must exist in the network.\n";
+            return;
+        }
+
+        // Add the friendship (bidirectional)
+        network[user1].insert(user2);
+        network[user2].insert(user1);
+        cout << "Friendship added between " << user1 << " and " << user2 << ".\n";
+    }
+
+    // Display a user's friends
+    void displayUser(const string& user) const {
+        if (network.find(user) == network.end()) {
+            cout << user << " does not exist in the network.\n";
+            return;
+        }
+
+        cout << user << "'s friends: ";
+        if (network.at(user).empty()) {
+            cout << "No friends yet.\n";
+        } else {
+            for (const auto& friendName : network.at(user)) {
+                cout << friendName << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    // Suggest friends (friends of friends) for a user
+    void suggestFriends(const string& user) const {
+        if (network.find(user) == network.end()) {
+            cout << user << " does not exist in the network.\n";
+            return;
+        }
+
+        unordered_set<string> suggestions;
+        const auto& friends = network.at(user);
+
+        for (const auto& friendName : friends) {
+            // Check each friend of the current user's friends
+            for (const auto& fof : network.at(friendName)) {
+                // If the friend of a friend is not the user and not already a direct friend
+                if (fof != user && friends.find(fof) == friends.end()) {
+                    suggestions.insert(fof);
+                }
+            }
+        }
+
+        // Display suggestions
+        cout << "Friend suggestions for " << user << ": ";
+        if (suggestions.empty()) {
+            cout << "No suggestions available.\n";
+        } else {
+            for (const auto& suggestion : suggestions) {
+                cout << suggestion << " ";
+            }
+            cout << endl;
+        }
+    }
+};
 
 
 
