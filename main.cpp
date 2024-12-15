@@ -10,10 +10,12 @@
 #include <bitset>
 #include <stack>
 #include <array>
-
+#include <sstream>
+#include <iomanip>
 
 //test
 using namespace std;
+//using std::vector;
 
 class TrieNode;
 class Trie;
@@ -2649,15 +2651,88 @@ int shortestTransformationSequence(string start, string end, vector<string>& dic
                   }
             }
       }
-
-
-
       return -1;
-
 }
+
+class MergingCommunities {
+private:
+    std::vector<int> parent, rank, size;
+
+public:
+    // Constructor
+    MergingCommunities(int n) {
+        // Initialize parent and size vectors
+             
+            size.resize(n,1);
+            rank.resize(n,0);
+            parent.resize(n);
+            for (int i = 0; i < n; i++) 
+               parent[i]= i; // Each node is its own parent
+    }
+
+      int find(int x){
+            if (parent[x] == x)
+                  return x;
+            parent[x] = find(parent[x]);
+            return parent[x];
+      }
+   
+    // Connect two nodes
+      void connect(int x, int y) {
+        // Implementation for union operation
+        int rootX = find(x);
+        int rootY = find(y);
+
+        if (rootX == rootY)
+            return;
+
+        if (rank[rootX] == rank[rootY] ){
+            rank[rootX]++;
+            parent[rootY] = rootX;
+            size[rootX] += size[rootY];
+            }
+        else if (rank[rootX] > rank[rootY]) {
+                  parent[rootY] = rootX;
+                  size[rootX] += size[rootY];
+            }
+        else{ 
+                  parent[rootX] = rootY;
+                  size[rootY] += size[rootX];
+            }
+       return ;
+    }
+
+    // Get the size of the community of a given node
+    int getCommunitySize(int x) {
+        // Implementation to find the size of the community
+
+        return size[find(x)];; // Placeholder
+    }
+};
+
+};
+
+class Headlands{
+
+public:
+
+/*
+static bool compareChains(const  vector<pair<vector<int>,int>>  & a, const  vector<pair<vector<int>,int>> & b ){
+       if (a.empty() || b.empty()) 
+            return false;
+      
+      return a[0].second > b[0].second ;
+}
+*/
+
+
+
+
+
 
 
 };
+
 
 class SocialNetwork{
 private:
@@ -7085,72 +7160,197 @@ vector<int> sortArrayByParityV2(vector<int>& nums) {
 
 /*****************************************************************************************/
 
-   int main(){   
-/*
-cout << "Main Start"<<endl; 
+//HH:MM:SS
+string timeFormat(int seconds){
 
-vector<int> nums1 = {1,2,2,1};
-vector<int> nums2 = {2,2};
-vector<vector<int>> nums3 = {{1,2,3},{4,5,6},{7,8,9}};
+      using namespace std;
+      int hours = seconds/3600;
+      int mins  =  (seconds % 3600)/60;
+      int secs  = seconds % 60;
 
-string a = "leetcode";  
-string b = "leeto";
+      return ((hours <10) ? "0":"") + to_string(hours) + ":" + ((mins < 10) ? "0":"") + to_string(mins) + ":"     
+       + ((secs <10) ? "0":"") + to_string(secs);
+      std::ostringstream oss;
+      oss << std::setw(2) << std::setfill('0') << hours << ":"
+        << std::setw(2) << std::setfill('0') << mins << ":"
+        << std::setw(2) << std::setfill('0') << secs;
 
-vector<string> strs = {"flower","flow","flight"};
-MyLinkedList linkeList;
- */               
-
-//replaceElements(nums1);
-//validMountainArray(nums1);
-//checkIfExist(nums1);
-//removeDuplicates(nums1);
-//mergeSort(nums1,1,nums2,0);
-//duplicateZeros(nums1);
-// oveZeroes(nums1);
-//heightChecker(nums1);
-//findMaxConsecutiveOnes(nums1);
-//thirdMax(nums1);
-//findDisappearedNumbers(nums1);
-//pivotIndex(nums1);
-//dominantIndex(nums1);
-//plusOne(nums1); 
-//findDiagonalOrder(nums2);
-//spiralOrder(nums2);
-//generate(5);
-//addBinary(a,b);
-//strStr(a,b);
-//longestCommonPrefix(strs);
-//arrayPairSum( nums1);
-//countingSort( nums1);
-//twoSum(nums1,9);
-//minSubArrayLen( 7,nums1);
-//rotate(nums1, 2);
-//getRow(4);
-//reverseWords("  Bob    Loves  Alice   ");
-
-//intersection(nums1,nums2);
-/*
-MyLinkedList linkeList2;
-
-linkeList.addAtTail(1);
-linkeList.addAtTail(2);
-linkeList.addAtTail(4);
-
-linkeList2.addAtTail(1);
-linkeList2.addAtTail(3);
-linkeList2.addAtTail(4);
-
-
-vector<string> anagrams = {"eat","tea","tan","ate","nat","bat"};
-groupAnagrams(anagrams);
-*/
-//isPalindrome("");
-//firstUniqChar("loveleetcode");
-//vector<int> binaryVector= {-1,0,3,5,9,12} ;
-
-
-
-
-
-return 0;
+    return oss.str();
 }
+
+struct Chain{
+
+      vector<size_t> jobIds;
+      size_t totalRuntime;
+};
+
+struct JobInfo{
+
+      size_t runtimeSeconds;
+      size_t nextJobId; 
+};
+
+int main(){   
+
+      using namespace std;
+    
+      
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,10,2\n2,20,3\n3,30,4\n4,40,0\n5,15,6\n6,25,0";
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,60,23\n2,23,3\n3,12,0\n23,30,0";
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,100,0"; 
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,60,2\n2,30,0\n3,45,4\n4,20,0\n5,10,0"; 
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,10,2\n2,20,3\n3,30,4\n4,40,0"; 
+      // Expected Output: Chain 1: [1 -> 2 -> 3 -> 4] Total Runtime: 100 seconds
+      
+      //edge Cases
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id"; 
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,0,0"; 
+      // Expected Output: Chain 1: [1] Total Runtime: 0 seconds
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,60,99"; 
+      // Expected Output: Error: Job 99 referenced by next_job_id is missing from the input.
+      string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,60,2\n1,30,0\n2,20,0"; 
+      // Expected Output: Error: Duplicate job_id 1 found in input.
+      //string inputStr = "1,60,23\n2,30,0"; 
+      // Expected Output: Error: Missing header row.
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,abc,23\n2,30,0"; 
+      // Expected Output: Error: Malformed input on line 2. Non-integer value found for runtime_in_seconds.
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,-10,2\n2,30,0"; 
+      // Expected Output: Error: Negative values are not allowed for runtime_in_seconds or job_id.
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,60\n2,30,0,extra"; 
+      // Expected Output: Error: Malformed input. Incorrect number of columns on line 2.
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,10,2\n2,20,1"; 
+      // Expected Output: Error: Circular chain detected involving job_id 1.
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,1,2\n2,1,3\n3,1,4\n4,1,5\n5,1,6\n6,1,7\n7,1,8\n8,1,9\n9,1,10\n...9998,1,9999\n9999,1,0"; 
+      // Expected Output: Chain 1: [1 -> 2 -> 3 -> ... -> 9999] Total Runtime: 9999 seconds
+      //string inputStr = "#job_id,runtime_in_seconds,next_job_id\n1,2,10\n10,15,20\n20,25,30\n30,35,10";
+      // Expected Output: Error: Circular chain detected involving job_id 10, 20, and 30.
+
+
+    /*#job_id,runtime_in_seconds,next_job_id
+      1,10,2
+      2,20,3
+      3,30,4
+      4,40,0
+      5,15,6
+      6,25,0
+      */
+    // Create a stringstream to simulate getline reading from a string
+    //stringstream inputStream(inputStr);
+    
+    //getline(inputStream, inputLine);
+      string inputLine;
+      getline(cin, inputLine);
+
+      if ( inputLine != "#job_id,runtime_in_seconds,next_job_id" )
+          throw std::logic_error("Missing Header");            
+
+      unordered_map<int,JobInfo> logContainer;  
+      vector<int> startJobs;
+      unordered_set<int> nextJobSet;
+
+      while(getline(cin, inputLine)){
+
+            stringstream ss(inputLine);
+            int jobId;
+            int runtimeSeconds;
+            int nextJobId; 
+            char delimiter1;
+            char delimiter2;
+
+            if (! (ss >> jobId >> delimiter1 >> runtimeSeconds >> delimiter2 >> nextJobId) )
+                  throw std::logic_error("Log Input Malformed: " + inputLine );
+            if (jobId <= 0 || runtimeSeconds < 0 || nextJobId < 0 || delimiter1 != ',' || delimiter2 != ',' ) 
+                         throw std::logic_error("Log Input Malformed: " + inputLine );
+
+            JobInfo jobInfo =  {static_cast<size_t>(runtimeSeconds),static_cast<size_t>(nextJobId)};
+            auto result1 = logContainer.insert({jobId,move(jobInfo)}) ;
+           
+            if (!result1.second)
+			      throw std::logic_error("Duplicate job ID detected: " + to_string(jobId) );
+
+            if (nextJobId > 0 ){
+                  auto result2  =  nextJobSet.insert(nextJobId);
+                  if (!result2.second)
+			      throw std::logic_error("Duplicate next job ID detected: " + to_string(nextJobId));
+            }
+      }
+
+      if (logContainer.empty())
+            throw std::logic_error("No log entry found.");
+            
+
+      // Find all starting jobs (jobs that aren't "next" jobs for others)
+      for (const auto & [jobId,jobInfo] : logContainer){
+            if (jobInfo.nextJobId !=0 && logContainer.find(jobInfo.nextJobId) == logContainer.end() )
+                  throw std::logic_error("Job ID: " + to_string(jobId) 
+                  +  " referencing non existing next Job ID: " + to_string(jobInfo.nextJobId)  );
+      
+            if ( nextJobSet.find(jobId) == nextJobSet.end() )
+                  startJobs.push_back(jobId);
+      }
+
+      if (startJobs.empty())
+             throw std::logic_error("No independet starting Jobs.") ;
+            
+      vector<Chain> chains;
+      chains.reserve(startJobs.size());
+      
+       for (const int startJob : startJobs) {
+            
+            Chain chainStruct;
+            chainStruct.totalRuntime = 0;             
+            size_t currentJob = startJob;
+            
+            while(currentJob != 0 ){
+            
+                  const auto & jobInfo =  logContainer[currentJob];      
+
+                  chainStruct.jobIds.push_back(currentJob);
+                  currentJob = jobInfo.nextJobId;                  
+                  chainStruct.totalRuntime += jobInfo.runtimeSeconds;                 
+            }
+            chains.push_back(move(chainStruct));
+      }
+
+      sort(chains.begin(),chains.end(),[](const  Chain  & a, const  Chain & b ){
+            return a.totalRuntime > b.totalRuntime ;
+             }
+      );
+      
+      //vector<pair<vector<int>,int>>
+      for (const auto & chain:chains ){
+            cout << "-" << endl;
+            cout << "start_job: "<< chain.jobIds.front() << endl;
+            cout << "last_job: " << chain.jobIds.back() << endl;
+            cout << "number_of_jobs: " << chain.jobIds.size() << endl;
+            string a = timeFormat(chain.totalRuntime) ;
+            cout << "job_chain_runtime: " << timeFormat(chain.totalRuntime) << endl;
+            int averageTime = chain.jobIds.size() ? chain.totalRuntime / chain.jobIds.size() : 0;
+            string b = timeFormat(averageTime);
+            cout << "avarage_job_time: " << timeFormat(averageTime) << endl;
+            string res = "start_job: " + to_string(chain.jobIds.front()) + 
+             " last_job: " + to_string(chain.jobIds.back()) + 
+             " number_of_jobs: " + to_string(chain.jobIds.size()) + 
+             " job_chain_runtime: " + a + 
+             " average_job_time: " + b;
+
+
+            int c =6;
+      }
+
+      return 0;
+}
+
+
+
+
+      /*if (logContainer.size() > visited.size()){
+            size_t zombieCount = logContainer.size() - visited.size();
+            cout << zombieCount << " zombie entries found:" << endl;
+            for (const auto& [jobId, jobInfo] : logContainer) {
+                  if (visited.find(jobId) == visited.end()) {
+                  cout << " - Job ID: " << jobId << endl;
+            }
+        }
+        return 1;
+      }*/
