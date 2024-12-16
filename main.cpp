@@ -7416,8 +7416,6 @@ int main(){
       //ambigious - when 2 commits are united by 1 file but the other not fully matched. 
       // files are uniting 2 commits to the same repo . 
 
-      
-
       size_t N;
       cin >> N;
       cin.ignore(); //ignore new line
@@ -7444,25 +7442,27 @@ int main(){
             while (ss >> param1 >> param2) 
                   commit.files.emplace_back(param1, param2);
     
-           
-            //loop all files in the entry 
+            //loop all files in current entry 
            for (const auto &file : commit.files) {
-                  const string &filePath = file.path;
-                  const string &opaqueId = file.opaqueID;
+                  const string & filePath = file.path;
+                  const string & opaqueId = file.opaqueID;
 
                   // search repo for file add it if doesn't exist 
                   //if it does exist unite
                   if (fileToRepo[filePath].count(opaqueId) == 0) 
                         fileToRepo[filePath][opaqueId] = commit.id;
-                  else{
+                  else{ //find to where to add the commit in th union set
                         int existingCommit = fileToRepo[filePath][opaqueId];
                         uf.unionSets(commit.id, existingCommit);
                   }
-
-           
+                // checking anbguity for every file added
+                //loop on all memebers of the 2nd level map that matches file path
+                for (const auto &otherOpaque : fileToRepo[filePath]) {
+                        if (otherOpaque.first != opaqueId) {
+                              throw logic_error("AMBIGIOUS INPUT!");
+                }
+            }
            }
-
-
 
             commits.push_back(std::move(commit));
       }     
@@ -7475,7 +7475,7 @@ int main(){
 
 
 
-             throw logic_error("AMBIGIOUS INPUT!");
+            
 
 
       } catch(const std::logic_error& e) {
