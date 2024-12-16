@@ -7189,7 +7189,7 @@ struct JobInfo{
       size_t runtimeSeconds;
       size_t nextJobId; 
 };
-
+/*
 int main(){   
 
       using namespace std;
@@ -7226,7 +7226,7 @@ int main(){
       // Expected Output: Error: Circular chain detected involving job_id 10, 20, and 30.
 
 
-    /*#job_id,runtime_in_seconds,next_job_id
+    #job_id,runtime_in_seconds,next_job_id
       1,10,2
       2,20,3
       3,30,4
@@ -7238,6 +7238,9 @@ int main(){
     //stringstream inputStream(inputStr);
     
     //getline(inputStream, inputLine);
+     
+     
+     /*
       string inputLine;
       getline(cin, inputLine);
 
@@ -7339,18 +7342,149 @@ int main(){
       }
 
       return 0;
+      
+}
+*/
+
+struct File{
+
+public:
+     File(const string & path,const string & opaqueID):path(path),opaqueID(opaqueID){}            
+     
+      string path;
+      string opaqueID;
+};
+
+struct Commit{
+
+      uint64_t id;
+      uint64_t timeStamp;
+      vector<File> files;
+};
+
+//class to unite commits to repo
+class UnionFindDR{
+
+private:
+      //not using vector since we don't know the range of id's
+      unordered_map<int, int> parent;
+      unordered_map<int, int> rank;
+public:
+
+      int find (int x){
+            if (parent.find(x) == parent.end())
+                  parent[x] = x;
+            
+            if (parent[x] != x)
+                  parent[x] =  find(x);  // path compression
+            
+            return parent[x];
+      }
+      //union by rank 
+      bool unionSets(int x , int y){
+
+            int rootX = parent[x];
+            int rootY = parent[y];
+
+            if ( rootX != rootY ){
+
+                  size_t rankX = rank.find(rootX) == rank.end() ? 1 : rank[rootX];
+                  size_t rankY = rank.find(rootY) == rank.end() ? 1 : rank[rootY]; 
+
+                  if (rankX == rankY){
+                        parent[rootY] =rootX;
+                        rank[rankX]++;
+                  }else 
+                        if (rankX > rankY)
+                              parent[rootY] =rootX;
+                        else 
+                              parent[rootX] =rootY;
+                  return true;
+            }
+            return false;
+      }
+};
+
+
+//Disaster Recovery
+int main(){
+      try{
+      //every log entry is a commit 
+      //every file is described by path and opaque id 
+      //Two commits for different repositories may contain the same file path, but the file's opaque identifier should be distinct, and vice-versa 
+      //matching path and opaque will go to the same repo 
+      //ambigious - when 2 commits are united by 1 file but the other not fully matched. 
+      // files are uniting 2 commits to the same repo . 
+
+      
+
+      size_t N;
+      cin >> N;
+      cin.ignore(); //ignore new line
+      
+      vector<Commit> commits;
+      commits.reserve(N);
+      unordered_map<string, unordered_map<string, int>> fileToRepo; // 2 level map for the files
+      UnionFindDR uf;
+
+      for (int i = 0; i < N; i++){
+
+            string inputLine;
+            getline(cin, inputLine);
+
+            istringstream ss(inputLine);
+            Commit commit;
+            //id 38024 timestamp 74820 foo.py ac819f bar.py 0d82b9
+            
+            //add validation 
+            string param1 , param2;
+            if (! (ss >> param1 >> commit.id >> param2 >> commit.timeStamp ) )
+                   continue;
+            
+            while (ss >> param1 >> param2) 
+                  commit.files.emplace_back(param1, param2);
+    
+           
+            //loop all files in the entry 
+           for (const auto &file : commit.files) {
+                  const string &filePath = file.path;
+                  const string &opaqueId = file.opaqueID;
+
+                  // search repo for file add it if doesn't exist 
+                  //if it does exist unite
+                  if (fileToRepo[filePath].count(opaqueId) == 0) 
+                        fileToRepo[filePath][opaqueId] = commit.id;
+                  else{
+                        int existingCommit = fileToRepo[filePath][opaqueId];
+                        uf.unionSets(commit.id, existingCommit);
+                  }
+
+           
+           }
+
+
+
+            commits.push_back(std::move(commit));
+      }     
+
+
+      
+
+         
+         
+
+
+
+             throw logic_error("AMBIGIOUS INPUT!");
+
+
+      } catch(const std::logic_error& e) {
+            cout << "Caught a logic_error: " << e.what()<< endl; 
+
+      }catch(...){
+            cout << "caught an unknown exception"<<endl;
+      }
+
+      return 0;
 }
 
-
-
-
-      /*if (logContainer.size() > visited.size()){
-            size_t zombieCount = logContainer.size() - visited.size();
-            cout << zombieCount << " zombie entries found:" << endl;
-            for (const auto& [jobId, jobInfo] : logContainer) {
-                  if (visited.find(jobId) == visited.end()) {
-                  cout << " - Job ID: " << jobId << endl;
-            }
-        }
-        return 1;
-      }*/
