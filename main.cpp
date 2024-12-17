@@ -7415,7 +7415,6 @@ public:
       }
 };
 
-
 //Disaster Recovery
 int main(){
       try{
@@ -7435,7 +7434,7 @@ int main(){
 
        // 2 level map to represent file name and opauqeId. file name -> opaque -> commit ID
        //commit id in union id connects to root which is the actuall Repo ID.
-      unordered_map<string, unordered_map<string, int>> fileToRepo; // 2 level map for the files
+      unordered_map<string, unordered_map<string, int>> fileToRepo; 
 
       // union find to connect join commits to reposotories 
       UnionFindDR unionFind; 
@@ -7477,7 +7476,7 @@ int main(){
                         unionFind.unionSets(commit.id, existingCommit);
                   }
                 // checking ambiguity for every file added
-                //loop on all memebers of the 2nd level map that matches file path. covers the vicecersa requirment. 
+                // loop on all memebers of the 2nd level map that matches file path. covers the vicecersa requirment. 
                 for (const auto &otherOpaque : fileToRepo[filePath]) {
                         if (otherOpaque.first != opaqueId) {
                               throw logic_error("AMBIGIOUS INPUT!");
@@ -7500,20 +7499,20 @@ int main(){
       });
     }
       
-      int R;
+    int R;
     cin >> R;
     cin.ignore();
 
      for (int i = 0; i < R; ++i) {
-        long long startTime, endTime;
+        uint64_t startTime, endTime;
         string filePath, opaqueId;
         cin >> startTime >> endTime >> filePath >> opaqueId;
 
         vector<int> result;
         if (fileToRepo[filePath].count(opaqueId) > 0) {
-            int repoId = uf.find(fileToRepo[filePath][opaqueId]);
+            int repoId = unionFind.find(fileToRepo[filePath][opaqueId]);
             for (const auto &commit : repositories[repoId]) {
-                if (commit.timestamp >= startTime && commit.timestamp <= endTime) {
+                if (commit.timeStamp >= startTime && commit.timeStamp <= endTime) {
                     result.push_back(commit.id);
                 }
             }
@@ -7526,13 +7525,6 @@ int main(){
         cout << endl;
     }
          
-         
-
-
-
-            
-
-
       } catch(const std::logic_error& e) {
             cout << "Caught a logic_error: " << e.what()<< endl; 
 
