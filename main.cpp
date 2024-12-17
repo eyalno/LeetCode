@@ -7371,16 +7371,26 @@ private:
       unordered_map<int, int> rank;
 public:
 
+      bool addCommit(int x){
+           auto [it, success] = parent.insert({x, x});
+            if (success) {
+                rank[x] = 1; // Initialize rank for the new commit
+      }
+            return success;
+      }
+
+
       int find (int x){
             if (parent.find(x) == parent.end())
                   parent[x] = x;
             
             if (parent[x] != x)
-                  parent[x] =  find(x);  // path compression
+                  parent[x] =  find(x);  // path compression optimization
             
             return parent[x];
       }
-      //union by rank 
+      
+      //union by rank optimization
       bool unionSets(int x , int y){
 
             int rootX = parent[x];
@@ -7388,8 +7398,8 @@ public:
 
             if ( rootX != rootY ){
 
-                  size_t rankX = rank.find(rootX) == rank.end() ? 1 : rank[rootX];
-                  size_t rankY = rank.find(rootY) == rank.end() ? 1 : rank[rootY]; 
+                  size_t rankX = rank[rootX];
+                  size_t rankY = rank[rootY]; 
 
                   if (rankX == rankY){
                         parent[rootY] =rootX;
@@ -7422,8 +7432,16 @@ int main(){
       
       vector<Commit> commits;
       commits.reserve(N);
+
+       // 2 level map to represent file name and opauqeId. file name -> opaque -> commit ID
+       //commit id in union id connects to root which is the actuall Repo ID.
       unordered_map<string, unordered_map<string, int>> fileToRepo; // 2 level map for the files
-      UnionFindDR uf;
+
+      // union find to connect join commits to reposotories 
+      UnionFindDR unionFind; 
+
+      // contain the root(repisitory id) and all related commits
+      unordered_map<int, vector<Commit>> repositories;
 
       for (int i = 0; i < N; i++){
 
@@ -7437,10 +7455,13 @@ int main(){
             //add validation 
             string param1 , param2;
             if (! (ss >> param1 >> commit.id >> param2 >> commit.timeStamp ) )
-                   continue;
+                   continue;  //discared malformed entries 
             
+            if (unionFind.addCommit(commit.id))
+                   continue;  //discared malformed entries. commit id need to be unique.
+
             while (ss >> param1 >> param2) 
-                  commit.files.emplace_back(param1, param2);
+                  commit.files.emplace_back(param1, param2); // emplace to avoid expensive copying
     
             //loop all files in current entry 
            for (const auto &file : commit.files) {
@@ -7448,28 +7469,62 @@ int main(){
                   const string & opaqueId = file.opaqueID;
 
                   // search repo for file add it if doesn't exist 
-                  //if it does exist unite
+                  //if it does exist add it to repo 
                   if (fileToRepo[filePath].count(opaqueId) == 0) 
-                        fileToRepo[filePath][opaqueId] = commit.id;
-                  else{ //find to where to add the commit in th union set
+                        fileToRepo[filePath][opaqueId] = commit.id; // the root in union find with be the Repo id.
+                  else{ //find to where to add the commit in the unionFind set
                         int existingCommit = fileToRepo[filePath][opaqueId];
-                        uf.unionSets(commit.id, existingCommit);
+                        unionFind.unionSets(commit.id, existingCommit);
                   }
-                // checking anbguity for every file added
-                //loop on all memebers of the 2nd level map that matches file path
+                // checking ambiguity for every file added
+                //loop on all memebers of the 2nd level map that matches file path. covers the vicecersa requirment. 
                 for (const auto &otherOpaque : fileToRepo[filePath]) {
                         if (otherOpaque.first != opaqueId) {
                               throw logic_error("AMBIGIOUS INPUT!");
                 }
             }
            }
-
-            commits.push_back(std::move(commit));
+            commits.push_back(std::move(commit)); //move to avoid expensive copy of commit
       }     
 
+      // building the newly organised repository  
+      for (auto &commit : commits) {
+            int repoId = unionFind.find(commit.id);
+            repositories[repoId].push_back(std::move(commit));
+      }
 
+      //order each repository by increasing of timestamp,id.
+      for (auto &repo : repositories) {
+        sort(repo.second.begin(), repo.second.end(), [](const Commit &a, const Commit &b) {
+            return a.timeStamp < b.timeStamp || (a.timeStamp == b.timeStamp && a.id < b.id);
+      });
+    }
       
+      int R;
+    cin >> R;
+    cin.ignore();
 
+     for (int i = 0; i < R; ++i) {
+        long long startTime, endTime;
+        string filePath, opaqueId;
+        cin >> startTime >> endTime >> filePath >> opaqueId;
+
+        vector<int> result;
+        if (fileToRepo[filePath].count(opaqueId) > 0) {
+            int repoId = uf.find(fileToRepo[filePath][opaqueId]);
+            for (const auto &commit : repositories[repoId]) {
+                if (commit.timestamp >= startTime && commit.timestamp <= endTime) {
+                    result.push_back(commit.id);
+                }
+            }
+        }
+
+        sort(result.begin(), result.end());
+        for (int id : result) {
+            cout << id << " ";
+        }
+        cout << endl;
+    }
          
          
 
