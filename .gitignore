@@ -4,4 +4,8 @@
 *.dSYM/
 main
 .DS_Store
-DisasterRecovery
+bitWise
+CodingInterviewPatterns
+PatternsToSolveLeetCode8
+PatternsToSolveLeetCode15
+Trie
