@@ -1,0 +1,7 @@
+*.o
+*.out
+*.exe
+*.dSYM/
+main
+.DS_Store
+DisasterRecovery
