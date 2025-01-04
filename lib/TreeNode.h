@@ -15,8 +15,9 @@ public:
     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
 
     // Constructor for TreeNode with a value, left, and right children
-    TreeNode(int x, TreeNode* left, TreeNode* right) 
-        : val(x), left(left), right(right) {}
+    TreeNode(int x, TreeNode* left, TreeNode* right)
+        : val(x), left(left), right(right) {
+    }
 };
 
 #endif // TREENODE_H

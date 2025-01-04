@@ -20,16 +20,16 @@ public:
     }
 
     // Finds the root of the element x (O(n) in worst case)
-    int find(int x) { 
+    int find(int x) {
         if (parent[x] == x)
             return x;
         return find(parent[x]);
     }
 
     // Unites the sets containing a and b (O(n) in worst case)
-    void unionSets(int a, int b) { 
+    void unionSets(int a, int b) {
         int rootA = find(a);
-        int rootB = find(b);      
+        int rootB = find(b);
 
         if (rootA != rootB)
             parent[rootB] = rootA;
@@ -41,19 +41,19 @@ public:
     }
 
     // Quick Find: returns the root of x (O(1) time)
-    int quickFind(int x) { 
+    int quickFind(int x) {
         return root[x];
     }
 
     // Quick Find Union: unites the sets containing a and b (O(n) time)
-    void quickFindUnionSets(int a, int b) { 
+    void quickFindUnionSets(int a, int b) {
         int rootA = quickFind(a);
-        int rootB = quickFind(b);      
+        int rootB = quickFind(b);
 
         if (rootA != rootB) {
             for (int i = 0; i < root.size(); ++i) {
                 if (root[i] == rootB)
-                    root[i] = rootA;     
+                    root[i] = rootA;
             }
         }
     }
@@ -64,25 +64,25 @@ public:
     }
 
     // Quick Union: finds the root of x (O(1) time)
-    int quickUnionFind(int x) { 
+    int quickUnionFind(int x) {
         while (root[x] != x)
             x = root[x];
         return x;
     }
 
     // Quick Union: unites the sets containing a and b (O(1) time)
-    void quickUnionSets(int a, int b) { 
+    void quickUnionSets(int a, int b) {
         int rootA = find(a); // can be O(n)
-        int rootB = find(b);      
+        int rootB = find(b);
 
         if (rootA != rootB)
             parent[rootB] = rootA;
     }
 
     // Union by Rank: unites the sets containing a and b (O(1) time)
-    bool unionbyRank(int a, int b) { 
+    bool unionbyRank(int a, int b) {
         int rootA = findPathCompression(a); // can be O(log n)
-        int rootB = findPathCompression(b);      
+        int rootB = findPathCompression(b);
 
         if (rootA == rootB)
             return false;
@@ -95,7 +95,7 @@ public:
             else {
                 rank[rootA]++;
                 root[rootB] = rootA;
-            } 
+            }
         }
         return true;
     }

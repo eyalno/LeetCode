@@ -8,18 +8,18 @@ using namespace std;
 // Node class definition
 class Node {
 public:
-     Node() : val(0), next(NULL), prev(NULL), child(NULL), random(NULL), left(NULL), right(NULL) {}
+    Node() : val(0), next(NULL), prev(NULL), child(NULL), random(NULL), left(NULL), right(NULL) {}
 
-      Node(int num) : val(num), next(NULL), prev(NULL), child(NULL), random(NULL), left(NULL), right(NULL) {}
+    Node(int num) : val(num), next(NULL), prev(NULL), child(NULL), random(NULL), left(NULL), right(NULL) {}
 
-      int val;
-      int data;
-      Node* left;
-      Node* right;
-      Node* next;
-      Node* prev;
-      Node* child;
-      Node* random;
+    int val;
+    int data;
+    Node* left;
+    Node* right;
+    Node* next;
+    Node* prev;
+    Node* child;
+    Node* random;
 };
 
 // LinkedList class definition
@@ -49,7 +49,7 @@ public:
 
     // Removes the first occurrence of the node with the given data
     void remove(int data) {
-        if (!head) 
+        if (!head)
             return;
 
         // If the node to be removed is the head
