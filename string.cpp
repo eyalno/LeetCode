@@ -392,3 +392,128 @@ vector<vector<string>> groupAnagrams(vector<string>& strs)
       return ret;
       */
 }
+
+
+      string reverseWords(string s)
+      {
+
+            //  hello   world
+
+            // in place with indices
+
+            reverse(s.begin(), s.end());
+
+            int n = s.size();
+            int idx = 0; // where we copy slower than start due to zeros
+
+            for (int start = 0; start < n; start++)
+            {
+
+                  if (s[start] != ' ')
+                  {
+
+                        // add space ignore begining
+                        if (idx != 0)
+                              s[idx++] = ' ';
+
+                        // word
+                        int end = start;
+                        while (s[end] != ' ' && end < n)
+                              s[idx++] = s[end++];
+
+                        reverse(s.begin() + idx - (end - start), s.begin() + idx);
+
+                        // end
+                        start = end;
+                  }
+            }
+
+            s.erase(s.begin() + idx, s.end());
+            return s;
+
+            // in place using built functions
+
+            /*
+            size_t start = 0;
+            size_t end =0 ;
+
+            start =  s.find_first_not_of(" \t",start);
+
+            s.erase(s.begin(),s.begin() + start);
+            reverse(s.begin(),s.end());
+            start =0;
+            start =  s.find_first_not_of(" \t",start);
+            s.erase(s.begin(),s.begin() + start);
+
+            start =0;
+            end =0 ;
+
+            while (end != string::npos){
+
+                  start =  s.find_first_not_of(" \t",start);
+                      if (start == string::npos)
+                        break;
+                  end = s.find_first_of(" \t",start);
+                  if (end == string::npos){
+
+                        end = s.length();
+                        reverse(s.begin()+start, s.begin() +end);
+                        break;
+                  }
+                  reverse(s.begin()+start, s.begin() +end);
+
+
+
+                  start = end+1;
+            }
+
+            start =0;
+            end =0 ;
+
+            while (end != string::npos){
+                  start = s.find_first_of(" \t",start);
+                    if (start == string::npos)
+                        break;
+                  end = s.find_first_not_of(" \t",start);
+                  start++;
+                  s.erase(start, end-start  );
+            }
+
+            return s;
+
+            */
+            // not in place
+            /*
+            size_t start = 0;
+            size_t end =0 ;
+            string ret;
+            vector<string> vec;
+
+            while (end != string::npos){
+
+                  start =  s.find_first_not_of(" \t",start);
+
+                  if (start == string::npos)
+                        break;
+
+                  end = s.find_first_of(" \t",start);
+
+                  string word = s.substr(start, end - start );
+                  start = end+1;
+
+                  vec.push_back(word);
+            }
+
+            reverse(vec.begin(),vec.end());
+
+            for (string w: vec){
+
+                  ret +=( w + ' ');
+            }
+
+            ret.pop_back();
+
+            return ret;
+
+            */
+      }

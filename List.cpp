@@ -599,3 +599,95 @@ ListNode* middleNode(ListNode* head)
 
               // two pass algorithem V2
       }
+
+
+       ListNode* detectCycle(ListNode* head)
+      {
+
+            /*
+            unordered_set<ListNode *> set;
+
+            ListNode * curr = head;
+
+            while (curr != NULL){
+
+                  if (set.find(curr) != set.end())
+                        return curr;
+
+                  set.insert(curr);
+
+                  curr = curr->next;
+            }
+
+            return NULL;
+            */
+
+            // Floyd's Tortoise and Hare
+
+            ListNode* slow = head;
+            ListNode* fast = head;
+
+            while (fast != NULL && fast->next != NULL)
+            {
+
+                  slow = slow->next;
+                  fast = fast->next->next;
+                  if (slow == fast)
+                        break;
+            }
+
+            if (fast == NULL || fast->next == NULL)
+                  return NULL;
+
+            slow = head;
+
+            while (slow != fast)
+            {
+                  slow = slow->next;
+                  fast = fast->next;
+            }
+
+            return slow;
+      }
+
+       ListNode* getIntersectionNode(ListNode* headA, ListNode* headB)
+      {
+
+            // two pointers
+            ListNode* ptr1 = headA;
+            ListNode* ptr2 = headB;
+
+            while (ptr1 != ptr2)
+            {
+                  ptr1 = ptr1 == nullptr ? headB : ptr1->next;
+                  ptr2 = ptr2 == nullptr ? headA : ptr2->next;
+            }
+
+            return ptr1;
+
+            // hash set
+            /*
+            unordered_set<ListNode* > set;
+
+            ListNode* curr = headA;
+
+            while(curr != nullptr){
+
+                  set.insert(curr);
+
+                  curr = curr->next;
+            }
+
+            curr = headB;
+
+            while (curr != nullptr){
+
+                  if(set.find(curr)!= set.end())
+                        return curr;
+
+                  curr = curr->next;
+            }
+            return nullptr;
+
+                */
+      }

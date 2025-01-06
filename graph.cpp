@@ -478,3 +478,42 @@ public:
             }
       }
 };
+
+
+//Coding Interview Patterns Pg. 287 
+bool prerequisites(int n, const vector<vector<int>>& prerequisites) {
+  
+vector<vector<int>> adjList(n);
+vector<int> inDegree(n,0); 
+
+for (const auto & pair :prerequisites){
+
+      int prerequisute = pair[0];
+      int course = pair[1];
+
+      adjList[prerequisute].push_back(course);
+      inDegree[course]++;
+}
+
+queue<int> q;
+
+for (int i = 0 ; i < inDegree.size(); i++)
+      if (inDegree[i] == 0)
+            q.push(i);
+
+int proccessed = 0;
+while (!q.empty()){
+
+      proccessed++;
+      int pre = q.front();
+      q.pop();
+
+      for (const int course :adjList[pre]  ){
+            inDegree[course]--;
+
+            if (inDegree[course] == 0 )
+                  q.push(course);
+      }
+}
+  return (proccessed == n);
+}
