@@ -517,3 +517,117 @@ while (!q.empty()){
 }
   return (proccessed == n);
 }
+
+
+//Coding Interview Patterns - Backtracking Pg. 298 
+// Time complexity O(n!) factorial. we explore n-1 n-2 for each level  
+// space O(n) the extra vector and the recursion call maximum depth n   
+
+void  find_all_permutationsDFS(vector<int>& nums, vector<bool> & visited, vector<int>  & current, vector<vector<int>> & results  );
+
+vector<vector<int>> find_all_permutations(vector<int>& nums) {
+    
+      int size = nums.size();
+      vector<bool>  visited(size,false);
+      vector<vector<int>>  results;
+      vector<int> current;
+      current.reserve(size);
+      find_all_permutationsDFS(nums,visited,current,results);
+
+      return results;
+}
+
+//for every node try all options.
+void  find_all_permutationsDFS(vector<int>& nums, vector<bool> & visited, vector<int>  & current, vector<vector<int>> & results  ){
+
+      static int size = nums.size();
+
+      if (current.size() == size){
+            results.push_back(current);
+            return;
+      }
+
+      for (int i = 0 ; i < size; i++ ){
+            if (visited[i]) continue;
+
+            visited[i] = true;
+            current.push_back(nums[i]);
+            find_all_permutationsDFS(nums,visited,current,results);
+
+            visited[i] = false;
+            current.pop_back();
+      }
+
+      return;
+}
+
+
+//Coding Interview Patterns - Backtracking Pg. 302
+//2^n subsets * n since 2 decisions 
+void findAllSubsetsDFSV1(const vector<int>& nums,int index, vector<int>& current,vector<vector<int>> & results  ); 
+void findAllSubsetsDFSV2(const vector<int>& nums,int index, vector<int>& current,vector<vector<int>> & results  ); 
+
+vector<vector<int>> findAllSubsets(const vector<int>& nums) {
+    
+
+      vector<vector<int>> results;
+      vector<int> current;
+      current.reserve(nums.size());
+
+      findAllSubsetsDFSV1(nums, 0 ,  current, results );
+      findAllSubsetsDFSV2(nums, 0 ,  current, results );
+
+      return results;
+}
+
+// run on the vector and include/exlude the next item. increasing the index making sure we dont inclue previous nums
+void findAllSubsetsDFSV1(const vector<int>& nums,int index, vector<int>& current,vector<vector<int>> & results ){
+
+      static int size = nums.size();
+
+      if (index == size){
+            results.push_back(current);
+            return;
+      }
+
+      // Exclude the current element at each step and recurse
+      findAllSubsetsDFSV1(nums, index + 1 ,  current, results );
+
+      //include the element 
+      current.push_back(nums[index]);
+      findAllSubsetsDFSV1(nums, index + 1 ,  current, results );
+      
+      //backtrack - go up the graph - return the previous state of the vector
+      current.pop_back();
+} 
+
+void findAllSubsetsDFSV2(const vector<int>& nums,int start, vector<int>& current,vector<vector<int>> & results ){
+
+      static int size = nums.size();
+      //adding subset
+      results.push_back(current);
+
+      // start all other subsets options 
+      // initally we start with including and  the pop back exclude the number and keep traversing 
+      for (int index = start; index < size; index++){
+            current.push_back(nums[index]);
+
+            findAllSubsetsDFSV2(nums, index + 1 ,  current, results );
+
+            current.pop_back();
+      }
+      return;
+}
+
+
+
+
+int nQueens(int n) {
+    // Write your code here
+    return 0;
+}
+
+
+int nQueensDFS(int n) {
+
+
