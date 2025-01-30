@@ -620,14 +620,302 @@ void findAllSubsetsDFSV2(const vector<int>& nums,int start, vector<int>& current
 }
 
 
-
-
+//Coding Interview Patterns - Backtracking Pg. 305
+void nQueensDFS(int n, int row, vector<int> & column,vector<int> & diag1 , vector<int> & diag2, int & count); 
+// time complexity n! each row n-a n-b n-c 
 int nQueens(int n) {
     // Write your code here
-    return 0;
+    
+    vector<int> column(n,0);
+    vector<int> diag1(2*n -1,0);
+    vector<int> diag2(2*n -1,0);
+    int count = 0;
+
+    nQueensDFS(n,0,column,diag1,diag2,count);
+
+    return count;
+}
+
+// we traverse all options we continue if not valid path and back track to check other flows
+void nQueensDFS(int n, int row, vector<int> & column,vector<int> & diag1 , vector<int> & diag2 ,int & count) {
+
+      if (row == n){
+            count++;
+            return;
+      }
+
+      for (int col = 0; col < n; col ++){
+
+            //check if each column fit. skip it 
+            if ( column[col] || diag1[col + row] || diag2[ row - col +n -1]  )
+                  continue;
+
+            column[col] = diag1[col + row] = diag2[ row - col +n -1] = 1 ;
+
+            // next column
+            nQueensDFS(n,row +1,column,diag1,diag2,count);
+
+            //backtrack remove the queen
+            column[col] = diag1[col + row] = diag2[ row - col +n -1] = 0 ;
+      }
+
+      return ;
 }
 
 
-int nQueensDFS(int n) {
+// Coding Interview Patterns - Dynamic Programming Pg. 311
+// Considered top down since starting from the main problem 
+//recursion tree with depth n. 2^n
+//with memoization n subproblems so O(n)
+int climbingStairsHelper(int n,vector<int> &memo);
+
+int climbingStairs(int n) {
+    
+      vector<int> memo(n+1,0); 
+
+      return climbingStairsHelper(n,memo);
+}
+
+int climbingStairsHelper(int n,vector<int> & memo) {
+
+//base case
+      if (n <= 2)
+            return n;
+
+      if (memo[n] != 0)
+            return memo[n];
+
+      // from this step only 1 step is possible so it is the same step so we add this two
+      memo[n] = climbingStairsHelper(n-1,memo) + climbingStairsHelper(n-2,memo);
+
+    return  memo[n];
+
+}
+//Bottom up DP
+int climbingStairsV2(int n) {
+    
+      vector<int> memo(n+1,0); 
+
+      memo[1] = 1;
+      memo[2] = 2;
 
 
+      for (int i =3; i <= n; i++ )
+            memo[i] = memo[i-2] +memo[i-1];
+
+      return memo[n];
+}
+
+//optimization 2 variable no vector
+int climbingStairsV3(int n) {
+    
+      if (n<=2)
+            return n;
+      
+      int oneStep = 2; 
+      int twoStep = 1;
+      
+      int current = 0;
+      for (int i = 3; i <= n; i++ ){
+            current = oneStep + twoStep;
+
+            oneStep = twoStep;
+            twoStep = current;
+      }
+
+      return current;
+}
+
+//Coding Interview Patterns - Dynamic Programming Pg. 316
+
+int minCoinCombinationHelper(const std::vector<int>& coins, int target,unordered_map<int,int> & memo);
+
+int minCoinCombination(const std::vector<int>& coins, int target) {
+    // Write your code here
+    
+    unordered_map<int,int> memo;
+
+    numeric_limits<int>::max();
+
+    int res = minCoinCombinationHelper(coins,target,memo);
+    
+
+    return res == numeric_limits<int>::max() ? -1 : res  ; // Placeholder return
+}
+
+int minCoinCombinationHelper(const std::vector<int>& coins, int target,unordered_map<int,int> & memo){
+
+      constexpr int INF = numeric_limits<int>::max(); 
+
+      if ( target == 0) return 0;
+      if ( target < 0) return INF; //nopt valid path
+
+      if (memo.find(target) != memo.end())
+            return memo[target];
+
+      int minCoins = INF;
+
+      //comparing all coins
+      for ( int coin:coins ){
+            
+            int res = minCoinCombinationHelper(coins,target - coin,memo); //new target
+
+            if (res != INF)
+                  minCoins =  min(minCoins,res +1) ; //new target + 1 = current target
+
+      }
+
+      memo[target] = minCoins;
+      return minCoins; // return current target     
+
+}
+//time compexity - max target subproblems for each target we loop n coins  = n * target
+//Bottom up solution can be acheived by translating memoizatin to DP array. 
+
+
+int minCoinCombinationV2(const std::vector<int>& coins, int target) {
+
+      constexpr int INF = numeric_limits<int>::max();
+
+      vector<int> dp(target + 1, INF);
+
+      dp[0] = 0; //base case
+
+      //populating the  target array if we can. 
+      
+      for (int currTarget = 1 ; currTarget <= target; currTarget++){
+
+            for (int coin: coins){
+                  //
+                  if (currTarget - coin >= 0 )
+                        dp[currTarget] = min(dp[currTarget], dp[currTarget - coin] + 1 ); 
+                        //might be more than one path to reach the target  
+            }
+      }
+
+return dp[target] != INF ? dp[target]: -1;
+
+}
+//time complexity target * coins
+
+//Coding Interview Patterns - Dynamic Programming Pg. 321
+
+int matrixPathways(int m, int n) {
+
+      vector<vector<int>> dp(m,vector<int>(n,0)); 
+
+      for (int i = 0; i < m; i ++  )
+            dp[i][0] = 1;
+
+      for (int i = 0; i < n; i ++  )
+            dp[0][i] = 1;
+
+      for (int i = 1; i < m; i ++)
+            for (int j=1; j < n ; j++)
+                  dp[i][j] = dp[i][j-1] + dp[i-1][j]; // the num of paths to each cell is the num above and to the left
+      
+      return dp[m-1][n-1];
+}
+
+//space optimization we only need to keep top row and current row
+//we can take one from current row and prev row
+int matrixPathwaysV2(int m, int n) {
+
+      vector<int> prevRow (n,1); //base
+      vector<int> currRow (n,0); //being populated
+
+      for (int i = 1; i < m; i ++){
+            currRow[0] = 1;
+            for (int j=1; j < n ; j++)
+                  currRow[j] =   currRow[j-1] + prevRow[j];
+            swap(prevRow ,currRow);
+      }
+
+      return prevRow[n-1];    
+ }
+
+ //Coding Interview Patterns - Dynamic Programming Pg. 325
+//we found sub problems if we rob the last house or skip it
+//and we defined a formula acording to it based on house i and previous DP. 
+// to populate dp D[i]  = max (DP[i-1] , DP[i-2]  + house[i] )
+ 
+ int neighborhood_burglary(const std::vector<int>& houses) {
+ 
+      int size = houses.size();
+      vector<int> dp(size,0);
+
+      if (size ==1)
+            return houses[0];
+      
+      //base cases
+      dp[0] = houses[0];
+      dp[1] = max(houses[0],houses[1]); // the most money that can be stolen
+
+      for (int i = 2; i < size; i ++)
+            dp [i] = max(dp[i-1], houses[i] + dp[i-2]);
+
+    return dp[size -1]; 
+}
+
+//Coding Interview Patterns - Dynamic Programming Pg. 329
+// if s1[i] == s2[i]
+      // dp[i][j] = 1 + dp[i+1][j+1]; 
+//else
+      //case when  not equal excluding each character 
+      //dp[i][j] = max(dp[i][j+1] , dp[i+1][j])
+
+int longest_common_subsequence(const std::string& s1, const std::string& s2) {
+    
+      int s1Size = s1.size();
+      int s2Size = s2.size();
+      
+      vector<vector<int>> dp(s1Size +1,vector<int> (s2Size+1,0));
+      
+      for (int i = s1Size-1;  i >= 0 ; i--)
+            for (int j = s2Size-1;  j >= 0 ; j--){
+                  
+                  if (s1[i] == s2[j])
+                        dp[i][j] = 1 + dp[i+1][j+1]; 
+                  else  
+                      dp[i][j] = max(dp[i][j+1] , dp[i+1][j]);
+            }
+
+    return dp[0][0]; // Placeholder return
+}
+
+//optimization - we don't 2d matrix 
+//we can take one from current row and prev row
+int longest_common_subsequenceV2(const std::string& s1, const std::string& s2) {
+    
+      int s1Size = s1.size();
+      int s2Size = s2.size();
+      
+      vector<int> prev(s2Size+1,0) , curr(s2Size+1,0);
+      
+      for (int i = s1Size-1 ;  i >= 0 ; i--){
+            for (int j = s2Size-1;  j >= 0 ; j--){
+                  if (s1[i] == s2[j])
+                        curr[j] = 1 + prev[j+1]; //  represents dp[i+1][j+1]
+                  else  
+                        curr[j] = max(curr[j+1] , prev[j]);
+            }
+            swap(prev,curr);
+      }
+
+    return prev[0]; // Placeholder return
+}
+
+//Coding Interview Patterns - Dynamic Programming Pg. 334
+
+//dp[i][j] -> true if s[i] == s[j] and dp[i+1][j-1] == true  -inner and outer
+//base case all length 1 are true dp[i][i] =true
+// if s[i] == s[i+1] then dp[i][i+1]
+
+string longestPalindrome(string s) {
+
+      int size = s.size();
+
+      
+
+
+}
