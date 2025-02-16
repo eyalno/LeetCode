@@ -24,8 +24,6 @@
 using namespace std;
 
 
-
-
 //1971. Find if Path Exists in Graph
 bool validPathDfs(int curr, int dest, unordered_map<int, vector<int>>& graph, unordered_set<int>& visited);
 bool validPath(int n, vector<vector<int>>& edges, int source, int destination)
@@ -907,15 +905,69 @@ int longest_common_subsequenceV2(const std::string& s1, const std::string& s2) {
 
 //Coding Interview Patterns - Dynamic Programming Pg. 334
 
-//dp[i][j] -> true if s[i] == s[j] and dp[i+1][j-1] == true  -inner and outer
+//. i-j range dp[i][j] -> true if s[i] == s[j] and dp[i+1][j-1] == true  -inner and outer
 //base case all length 1 are true dp[i][i] =true
 // if s[i] == s[i+1] then dp[i][i+1]
+// length 0 1 2 o inner substring 
 
-string longestPalindrome(string s) {
+string longestPalindromeCodingInterview(string s) {
 
       int size = s.size();
 
+      if (size == 0)
+            return "";
+
+      vector<vector<bool>> dp(size,vector<bool>(size,false));
+
+      int start = 0, maxLen = 1;
+
+      for (int i =0; i < size; i++) dp[i][i] = true;
+
+      for (int i = 0; i < size-1; i++ )
+            if (s[i] == s[i+1]){
+                  dp[i][i+1] = true;
+                  start = i;
+                  maxLen = 2;
+            }
+
+      // we have the base case dp now increase len and check all combination
+
+      for (int len = 3 ; len <= size  ; len++)
+            for (int i = 0 ; i <= size - len   ; i++){  // 8 -3  = 5
+                  int j = i + len-1;
+                  if (s[i] ==s[j] && dp[i+1][j-1]){
+                        dp[i][j] = true;
+                        start = i;
+                        maxLen = len;
+                  }
+            }
       
-
-
+      return s.substr(start,maxLen);
 }
+
+
+//optimized version expand from base cases
+/*
+string longestPalindromeV2(string s) {
+
+      int len = s.length();
+
+      if (len == 0) return "";
+
+      int start = 0 ;
+      int maxLen = 1;
+
+
+      for (int i = 0; i < len; i++ ){
+
+            if ( i  < len-1 && s[i] == s[i+1]){
+
+
+            }
+
+
+
+      }
+
+
+}*/

@@ -1432,6 +1432,7 @@ vector<int> twoSumMap(vector<int>& nums, int target)
       return indices;
 }
 
+//sorted array
 vector<int> twoSum(vector<int>& nums, int target)
 {
 
