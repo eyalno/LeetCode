@@ -206,10 +206,11 @@ private:
             vector<vector<int>> res;
             // sort vector
             int size = nums.size();
+            if (size < 3) return res;
             sort(nums.begin(), nums.end());
-
-            // since the aray sorted we can only search the nums right to i we
-            // avoid duplicates combination by that
+            // since the aray sorted we can only search the nums right to i we avoid duplicates combination by that
+            //creates order 
+            
             for (int i = 0; i < size - 2; i++)
             { // last 2 dont count
                   if (i > 0 && nums[i] == nums[i - 1])
@@ -767,30 +768,41 @@ private:
       {
 
             // Input: intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
-            // Output: [[1,2],[3,10],[12,16]]
-            vector<vector<int>> merged;
+    // Output: [[1,2],[3,10],[12,16]]
 
-            if (newInterval.empty())
-                  return merged;
+    if (newInterval.empty())
+       return intervals;
 
-            if (intervals.empty())
-            {
-                  merged.push_back(newInterval);
-                  return merged;
-            }
+    if (intervals.empty()){
+        intervals.push_back(newInterval);
+        return intervals;
+    }
 
-            int left = 0;
-            int right = intervals.size() - 1;
-            int newStart = newInterval[0];
+    vector<vector<int>> res;
 
-            while (left <= right)
-            {
-                  int mid = left + (right - left) / 2;
+    int i = 0 , n = intervals.size() ;
 
-                  auto& interval = intervals[mid];
-            }
+    // current interval dont overlap. left edge case
+    while (i < n &&  intervals[i][1] < newInterval[0]){
+        res.push_back(intervals[i]);
+        i++;
+    }
+    
+    // overlap begins. consume the intervals
+    while ( i < n && newInterval[1] >= intervals[i][0]  ){ 
+        newInterval[0] = min(newInterval[0] ,intervals[i][0] );
+        newInterval[1] = max(newInterval[1] ,intervals[i][1] );
+        i++;
+    }
+    res.push_back(newInterval);
 
-            return merged;
+    //remainder 
+    while ( i < n){
+        res.push_back(intervals[i]);
+        i++;
+    }
+
+    return res;
       }
 
       // 10. Binary Tree Traversal
