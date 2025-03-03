@@ -49,6 +49,7 @@ private:
 
       int findMaxLength(vector<int>& nums)
       {
+            //Prefix Sum + Hash Map
             unordered_map<int, int> map;
             int maxLength = 0;
 
@@ -56,11 +57,11 @@ private:
             if (nums.empty())
                   return 0;
 
-            sums.resize(size);
+            sums.resize(size); 
 
             // think of base case for edges can help
-            //  Base case: prefix sum 0 at index -1
-            map[0] = -1;
+            //  Base case: prefix sum 0 at index - 1
+            map[0] = -1;  // we assume that the prefix sum 0 appeared at index -1.
             sums[0] = nums[0] == 1 ? 1 : -1;
 
             for (int i = 1; i < size; i++)
@@ -68,7 +69,6 @@ private:
 
             for (int i = 0; i < size; i++)
             {
-
                   if (map.find(sums[i]) == map.end())
                         map[sums[i]] = i;
                   else
@@ -149,7 +149,7 @@ private:
       //167. Two Sum II - Input Array Is Sorted
       vector<int> twoSum(vector<int>& numbers, int target)
       {
-
+            // 2 sum sorted arra o(n) 2 pointers we move the one that get us closer to the sum
             int size = numbers.size();
             vector<int> res(2, 0);
 
@@ -203,6 +203,7 @@ private:
 
       vector<vector<int>> threeSum(vector<int>& nums)
       {
+            //basically 2 sum solution with outer loop 
             vector<vector<int>> res;
             // sort vector
             int size = nums.size();
@@ -310,14 +311,15 @@ private:
 
             for (int i = 0; i < size - 2; i++)
             { // last 2 dont count
-                  unordered_set<int> set;
+                  unordered_set<int> set;  // the set is new for every i . we used it jsut for the computation 
+                  // set and not map since we only care for the value 
                   if (i > 0 && nums[i] == nums[i - 1])
                         continue; // fix a number and skip duplicated after
 
                   for (int j = i + 1; j < size; j++)
                   { // k could be before or after j
 
-                        int complement = -(nums[i] + nums[j]);
+                        int complement = -(nums[i] + nums[j]); //complement is what k should be I J K
 
                         if (set.find(complement) != set.end())
                         {
@@ -326,7 +328,7 @@ private:
                                     j++; // j+1 means k ,
                         }
 
-                        set.insert(nums[j]); // add any j since it can be a complement
+                        set.insert(nums[j]); // *** add j previous while we loop we populate it . new set per i // we  
                   }
             }
             return res;
