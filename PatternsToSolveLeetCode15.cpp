@@ -61,7 +61,7 @@ private:
 
             // think of base case for edges can help
             //  Base case: prefix sum 0 at index - 1
-            map[0] = -1;  // we assume that the prefix sum 0 appeared at index -1.
+            map[0] = -1;  // we assume that the prefix sum 0 appeared at index -1. d
             sums[0] = nums[0] == 1 ? 1 : -1;
 
             for (int i = 1; i < size; i++)
