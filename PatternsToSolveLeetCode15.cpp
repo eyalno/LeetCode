@@ -82,7 +82,6 @@ private:
 
       int subarraySum(vector<int>& nums, int k)
       {
-
             int size = nums.size();
             vector<int> sums(size + 1, 0);
             int count = 0;
@@ -106,16 +105,16 @@ private:
 
       int subarraySumBrueteForce(vector<int>& nums, int k)
       {
-            // calculating  sum on the fly
+            // calculating  sum on the fly saving space 
 
             int size = nums.size();
             int count = 0;
             for (int start = 0; start < size; start++)
             {
-                  int sum = 0;
+                  int sum = 0; //we eliminate 1 cell at a time
                   for (int end = start; end < size; end++)
                   {
-                        sum += nums[end]; // savinf the extra loop
+                        sum += nums[end]; // saving the extra loop
                         if (sum == k)
                               count++;
                   }
@@ -149,11 +148,15 @@ private:
       //167. Two Sum II - Input Array Is Sorted
       vector<int> twoSum(vector<int>& numbers, int target)
       {
+            //Input: numbers = [2,7,11,15], target = 9
+            //Output: [1,2]
+
             // 2 sum sorted arra o(n) 2 pointers we move the one that get us closer to the sum
             int size = numbers.size();
             vector<int> res(2, 0);
 
-            for (int i = 0, j = size - 1; i < j;)
+            int i = 0 , j = size -1;
+            while (i < j)
             {
                   int sum = numbers[i] + numbers[j];
                   if (sum == target)
@@ -171,44 +174,67 @@ private:
             return res;
       }
 
-      vector<int> twoSumBinarySearch(vector<int>& numbers, int target)
-      {
-
-            int size = numbers.size();
-
-            for (int i = 0; i < size; i++)
-            {
-
-                  int complementary = target - numbers[i];
-
-                  // binary search complementary. /lgn performance
-                  int start = i + 1;
-                  int end = size - 1;
-
-                  while (start <= end)
-                  {
-
-                        int mid = start + (end - start) / 2;
-                        if (numbers[mid] == complementary)
-                              return { i + 1, mid + 1 };
-                        else if (numbers[mid] < complementary)
-                              start = mid + 1;
-                        else
-                              end = mid - 1;
-                  }
+      ///result unsorted requiremnet 
+      vector<int> twoSumHashOnePass(vector<int>& nums, int target) {
+        
+            unordered_map<int,int> map;
+            
+            for (int i = 0; i < nums.size(); i++){
+            
+                int comp = target - nums[i]; // hold the previous information
+            
+                if (map.find(comp) != map.end())
+                    return {i,map[comp]};
+                else
+                    map[nums[i]] = i;
+                
             }
-
+            
             return {};
       }
 
+      /*
+      
+            vector<int> twoSum(vector<int>& numbers, int target) {
+      
+        int size = numbers.size();
+
+      for (int i = 0; i < size; i++){
+
+            int complementary = target - numbers[i];
+
+            //binary search complementary
+            int start = i +1;
+            int end = size -1;
+            
+            while (start <= end){
+
+                  int mid = start + (end-start) /2;
+                  if (numbers[mid] == complementary)
+                        return {i+1,mid+1};
+                  else if (numbers[mid] < complementary)
+                        start = mid +1;
+                  else
+                        end = mid -1;
+            }
+      }
+
+return {};
+
+    }
+      
+      */
+
+
+
       vector<vector<int>> threeSum(vector<int>& nums)
       {
-            //basically 2 sum solution with outer loop 
+            //basically 2 sum solution with outer loop 2 pointers since retrun order doesn't matter
             vector<vector<int>> res;
             // sort vector
             int size = nums.size();
             if (size < 3) return res;
-            sort(nums.begin(), nums.end());
+            sort(nums.begin(), nums.end()); //sorting is important 
             // since the aray sorted we can only search the nums right to i we avoid duplicates combination by that
             //creates order 
             
@@ -226,7 +252,6 @@ private:
 
                   while (start < end)
                   {
-
                         int currSum = nums[start] + nums[end];
 
                         if (currSum == target)
@@ -251,7 +276,7 @@ private:
             // fixed number and sum 2 problem hashmap/
       }
 
-      // binary search
+      /*// binary search
       vector<vector<int>> threeSumBinarySearch(vector<int>& nums)
       {
             vector<vector<int>> res;
@@ -297,8 +322,10 @@ private:
             return res;
             // fixed number and sum 2 problem hashmap/
       }
+      */
 
       // Hash Set
+      //like the 2 set solution no benefit over the pointers
       vector<vector<int>> threeSumHashSet(vector<int>& nums)
       {
             vector<vector<int>> res;
@@ -378,7 +405,6 @@ private:
 
       double findMaxAverage(vector<int>& nums, int k)
       {
-
             int size = nums.size();
 
             double windowSum = 0.0;
@@ -389,7 +415,6 @@ private:
 
             for (int i = 1; i <= size - k; i++)
             {
-
                   windowSum += (-(nums[i - 1]) + nums[i + k - 1]);
 
                   max = std::max(windowSum, max);
@@ -398,8 +423,12 @@ private:
       }
 
       // BruteForce
+      // we find a duplicate we move to the next char.
       int lengthOfLongestSubstringBF(string s)
       {
+            //Input: s = "abcabcbb"
+            //Output: 3
+            //Explanation: The answer is "abc", with the length of 3.
 
             if (s.empty())
                   return 0;
@@ -418,7 +447,6 @@ private:
 
                   for (int j = i; j < size; j++)
                   {
-
                         if (seen.find(s[j]) != seen.end())
                               break; // duplicate found;
                         currLen++;
@@ -429,10 +457,16 @@ private:
             }
             return maxLen;
       }
+     
       // sliding window approach saves from recounting the length
+      //duplicates create windows from the begining like in BF
+      //every time we found duplicate we start new window.
       int lengthOfLongestSubstring(string s)
       {
-
+           //Input: s = "abcabcbb"
+            //Output: 3
+            //Explanation: The answer is "abc", with the length of 3.
+          
             if (s.empty())
                   return 0;
 
@@ -447,7 +481,7 @@ private:
             unordered_map<char, int> prevLoc; // Map to store the last seen index of each character
             int currLen = 0;
             int start = 0;
-            // the end is progressing the start jums between duplicates (windows)
+            // the end is progressing the start jumps between duplicates (windows)
             for (int end = 0; end < size; end++)
             {
                   char currCh = s[end];
@@ -470,7 +504,6 @@ private:
 
       bool hasCycle(ListNode* head)
       {
-
             ListNode* slow = head;
             ListNode* fast = head;
 
@@ -488,6 +521,7 @@ private:
       }
 
       // hash set
+      // not fast slow pointer
       bool hasCycleSet(ListNode* head)
       {
             unordered_set<ListNode*> set;
@@ -506,8 +540,17 @@ private:
             return false;
       }
 
-      bool isHappy(int n)
+      // follow the procdure use hash set to detect cycle 
+      bool isHappyHash(int n)
       {
+            //Input: n = 19
+            //Output: true
+            //Explanation:
+            //12 + 92 = 82
+            //82 + 22 = 68
+            //62 + 82 = 100
+            //12 + 02 + 02 = 1
+            
             unordered_set<int> set;
 
             while (1)
@@ -532,16 +575,9 @@ private:
             }
       }
 
-      /*
-       int findDuplicate(vector<int>& nums) {
-
-            int n =  nums.size();
-       }
-      */
 
       int removeDuplicates(vector<int>& nums)
       {
-
             //{0,0,1,1,1,2,2,3,3,4};
             int insertIndex = 1;
 
