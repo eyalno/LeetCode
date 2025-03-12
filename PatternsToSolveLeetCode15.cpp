@@ -422,6 +422,46 @@ return {};
             return max / k;
       }
 
+
+      int maxSumSubarray(vector<int>& nums, int k) {
+      
+            int maxSum =0;
+            int windowSum =0;
+
+            for (int i = 0; i < k; i++)
+                  windowSum += nums[i];
+
+            maxSum = windowSum;
+            for (int i = 0 ; i <= nums.size() - k; i++  )
+            {
+                  windowSum +=  - nums[i] + nums[i+k];
+                  maxSum = max(maxSum,windowSum); 
+            }
+            
+            return maxSum;
+      }
+
+      int minSubArrayLen(int S, vector<int>& nums) {
+            int left = 0, sum = 0;
+            int minLen =   numeric_limits<int>::max();
+      
+
+            for (int right = 0; right < nums.size(); right ++){ //expanding
+
+                  sum += nums[right];
+
+                  while(sum >= S){
+
+                        minLen = min(minLen, right - left + 1 );
+                        sum-=nums[left];  
+                        left++; //shrinking 
+                  }
+            }
+      
+            return minLen ==  (numeric_limits<int>::max()) ? 0: minLen;
+      }
+
+
       // BruteForce
       // we find a duplicate we move to the next char.
       int lengthOfLongestSubstringBF(string s)
@@ -479,17 +519,17 @@ return {};
             // maximum length until a duplicate is found
 
             unordered_map<char, int> prevLoc; // Map to store the last seen index of each character
-            int currLen = 0;
+            
             int start = 0;
             // the end is progressing the start jumps between duplicates (windows)
-            for (int end = 0; end < size; end++)
+            for (int end = 0; end < size; end++)  // expanding
             {
                   char currCh = s[end];
 
                   // If the character is already seen and within the current window
                   if (prevLoc.find(currCh) != prevLoc.end() && prevLoc[currCh] >= start)
                   {
-                        start = prevLoc[currCh] + 1; // Move the start to the right of the duplicate
+                        start = prevLoc[currCh] + 1; // Shrinking - Move the start to the right of the duplicate 
                   }
 
                   // Update the last seen index of the current character
@@ -499,6 +539,7 @@ return {};
             }
             return maxLen;
       }
+
 
       // 4. Fast and slow pointers array/Linked List
 
@@ -607,6 +648,11 @@ return {};
       // 6. Monotonic(increasing /decreasing)  Stack
       vector<int> nextGreaterElement(vector<int>& nums1, vector<int>& nums2)
       {
+            // Input: nums1 = [4,1,2], nums2 = [1,3,4,2]
+            // Output: [-1,3,-1]
+            // Explanation: The next greater element for each value of nums1 is as 
+
+
 
             return {};
       }
