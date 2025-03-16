@@ -548,11 +548,10 @@ return {};
             ListNode* slow = head;
             ListNode* fast = head;
 
-            while (fast && fast->next)
+            while (fast && fast->next) 
             { // if null we know not a cycle also this is the step .
-
                   slow = slow->next;
-                  fast = fast->next->next;
+                  fast = fast->next->next; //we build it based on 1/2 steps and the while condition accordingly
 
                   if (fast == slow)
                         return true;
@@ -616,7 +615,7 @@ return {};
             }
       }
 
-
+      // 5. LinkedList in-place reversal
       int removeDuplicates(vector<int>& nums)
       {
             //{0,0,1,1,1,2,2,3,3,4};
@@ -646,21 +645,137 @@ return {};
       }
 
       // 6. Monotonic(increasing /decreasing)  Stack
+     
+      // decrease stack we store in the stack only numbers that we haven't find a greater number for them.
+      // and by that we are keeping the decrease stack when we do find greater number we pop and set everything.
+      vector<int> nextGreaterElement(vector<int>& nums) {
+            //[2, 1, 2, 4, 3]
+            //[4, 2, 4, -1, -1]
+
+            //3,2,1,5
+            //5,5,5,-1
+
+            vector<int> res(nums.size(),-1);
+            stack<int> s;
+
+            for (int i = 0; i < nums.size(); i++)
+            {     //we empty the stack completely since it has order and update all indicies 
+                  while ( !s.empty() && nums[i] > nums[s.top()]  ){ // we compare the current num to the entire stack              
+                        res[s.top()] = nums[i]; //replace with greater element
+                        s.pop(); 
+                  }
+                  s.push(i); // we store index in stack till we find greater number
+
+            }
+            return res;
+      }
+     
+      vector<int> nextSmallerElement(vector<int>& nums) {
+
+           
+            vector<int> res(nums.size(),-1);
+
+            stack<int> s;
+            
+            for (int i = 0; i < nums.size(); i ++){
+                  //increaing stack. 
+                  while (!s.empty() && nums[i] < nums[s.top()] ){
+                        res[s.top()] = nums[i];
+                        s.pop();
+                  }
+                  s.push(i);
+            }
+            return res;
+      }
+     
+     
       vector<int> nextGreaterElement(vector<int>& nums1, vector<int>& nums2)
       {
             // Input: nums1 = [4,1,2], nums2 = [1,3,4,2]
             // Output: [-1,3,-1]
             // Explanation: The next greater element for each value of nums1 is as 
+              
+            vector<int> res(nums1.size(),-1);
+            stack<int> s;
+            unordered_map<int,int> m;
 
+            for (int i = 0; i < nums2.size(); i ++ ){
+                  
+                  while(!s.empty() && nums2[i] > nums2[s.top()]  ){
+                        m[nums2[s.top()]] = nums2[i];  // value and next greater element
+                        s.pop();
+                  }
+                  s.push(i);
+            }
+            //stack can have numbers
 
+            while (!s.empty())
+            {
+                  m[nums2[s.top()]] = -1;
+                  s.pop();
+            }
+            
 
-            return {};
+            for (int i =0; i < nums1.size(); i++)
+                  res[i] = m[nums1[i]];
+
+            return res;
       }
+
+      vector<int> nextGreaterElements2(vector<int>& nums) {
+      
+            //Input: nums = [1,2,1]
+            //Output: [2,-1,2]
+
+            int size = nums.size();
+            vector<int> res(size,-1);
+            stack<int> s;
+
+            for (int i = 0; i < size; i++){
+
+                  while (!s.empty() && nums[i] > nums[s.top()]){
+                        res[s.top()] = nums[i]; 
+                        s.pop();
+                  }
+                  s.push(i);
+            }
+
+            for (int i = 0; i < size  ; i++){
+                  while (!s.empty() && nums[i] > nums[s.top()]){
+                        res[s.top()] = nums[i]; 
+                        s.pop();
+                  }
+            }
+            return res;
+      }
+
+      //next greater element
+      vector<int> dailyTemperatures(vector<int>& temperatures) {
+      
+            //Input: temperatures = [73,74,75,71,69,72,76,73]
+            //Output: [1,1,4,2,1,1,0,0]
+
+            int size = temperatures.size();
+            vector<int> res(size,0);
+
+            stack<int> s;
+
+            for (int i = 0; i < size; i++ ){
+
+                  while (!s.empty() && temperatures[i] > temperatures[s.top()]    ){
+                        res[s.top()] = i - s.top();
+                        s.pop();
+                  }
+                  s.push(i);
+            }
+
+            return res;
+      }
+
 
       // 7. K largest  /k smallest /most frequent
       int findKthLargest(vector<int>& nums, int k)
       {
-
             int size = nums.size();
 
             priority_queue<int, vector<int>, greater<int>> minHeap;
