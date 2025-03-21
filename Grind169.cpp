@@ -418,9 +418,46 @@ void sortColors(vector<int>& nums) {
         }
 
     }
+}
+
+// 5. Longest Palindromic Substring
+string longestPalindromeAmazon(string s) {
+
+    int size = s.size();
+    vector<vector<bool>> dp(size,vector<bool>(size,false));
+    int maxLen = 1;
+    int start = 0;
+
+    if (size == 0)
+    return "";
 
 
+    //2 base cases
+    for ( int i = 0 ; i < size; i ++)
+        dp[i][i] = true;
 
+    for ( int i = 0; i < size -1 ; i++ ) 
+        if (s[i] == s[i+1]){      
+            dp[i][i+1] = true;
+            maxLen = 2;
+            start = i;
+        }
+    
+        //base cases for one and now build all dp for all lengths. 
+    for (int len = 3; len <= size; len++){
+
+        for (int i = 0; i <= size - len  ; i ++){ // 8 - 3
+            int j = i + len-1;
+
+            if (s[i] == s[j] && dp[i+1][j-1] ){
+                dp[i][j] = true;
+                maxLen = len;
+                start = i;
+            }
+        } 
+    }
+    //complexity saving repeating calculations 
+    return s.substr(start,maxLen);
 }
 
 

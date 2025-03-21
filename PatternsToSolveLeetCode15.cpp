@@ -797,6 +797,7 @@ return {};
             for (int num : nums)
                   freqMap[num]++;
 
+            // freq map the heap sort by first element in pair
             priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> minHeap;
 
             for (const auto& pair : freqMap)

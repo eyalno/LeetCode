@@ -116,45 +116,88 @@ public:
             return result;
       }
 
-      bool dfs(int course, vector<vector<int>>& graph, vector<int>& visited)
+      bool hasCycle(int course, vector<vector<int>>& graph, vector<int>& visited)
       {
-            // leafs stopping condition
-            if (visited[course] == 1) // cycle detected
-                  return false;
-            if (visited[course] == 2) //
-                  return true;
-
-            visited[course] = 1; // visiitng now
+            // a cycle mean we can't finish like lock.
+            // we check for cycles for current DFS path .
+            //2 state need if diamond shape we will detect circle incorrectly  
+            visited[course] = 1; // visitng now
+            
+            // Visit all neighbors BFS
             for (int next : graph[course])
             {
-                  if (!dfs(next, graph, visited))
-                        return false; // false propgates all the way  up
+                  if (visited[next] == 1) // cycle detected
+                        return true;
+                  
+                  if (visited[next] == 0) 
+                        if (hasCycle(next, graph, visited))
+                           return true; 
             }
 
-            visited[course] = 2; // mark as visited after traveresring
-            // on all descendants no cycle detected at this point
+            visited[course] = 2; // mark as visited after traveresring.  so we won't traverse it again.
+            // on all descendants no cycle detected at this point we ma
+            
 
-            return true;
+            return false;
       }
 
       bool canFinish(int numCourses, vector<vector<int>>& prerequisites)
       {
+            // 0 = not visited, 1 = visiting (in current DFS path), 2 = visited
+            vector<int> visited(numCourses, 0);  //if visited = cycle
 
-            vector<int> visited(numCourses, 0);
-
+      
             vector<vector<int>> graph(numCourses);
 
+            //build graph adjacency list based on prerequisites             
             for (const auto& pre : prerequisites)
-            {
                   graph[pre[1]].push_back(pre[0]);
-            }
-
-            for (int i = 0; i < numCourses; i++)
-                  if (visited[i] == 0 && !dfs(i, graph, visited)) // independent subgraphs
-                        return false;
+            
+            //check if graph Directed Acyclic Graph Check for cycles using DFS
+                  for (int i = 0; i < numCourses; i++) // every course starting point 
+                        if (visited[i] == 0)
+                              if (hasCycle(i, graph, visited)) //  independent subgraphs every course can be a starting point 
+                                    return false;
 
             return true;
       }
+
+      // traverse on indegree BFS
+      vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+
+            vector<int> inDegree(numCourses,0);
+            
+            vector<vector<int>> adjList(numCourses);
+            
+            vector<int> res;
+
+            for (auto pre:prerequisites){
+                  adjList[pre[1]].push_back(pre[0]);
+                  inDegree[pre[0]]++;
+            }
+
+            queue<int> queue;
+            for (int i = 0 ; i < numCourses; i ++) //starying points
+                   if (inDegree[i] == 0)
+                        queue.push(i);
+
+            while(!queue.empty()){
+                        
+                  int course = queue.front();
+                  queue.pop();
+                  res.push_back(course);
+                  
+                  for (int next:adjList[course]){
+                        inDegree[next]--;
+                        if (inDegree[next] == 0) 
+                              queue.push(next);
+                  }
+            }
+
+            return (res.size() != numCourses) ? vector<int>{} : res  ;
+      }
+
+
 
       vector<vector<int>> subsets(vector<int>& nums)
       {
