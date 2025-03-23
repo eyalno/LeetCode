@@ -320,9 +320,9 @@ vector<vector<int>> merge(vector<vector<int>>& intervals) {
 
     res.push_back(std::move(intervals[0]));
 
-    for (int i =1 ; i < size; i++ ){
+    for (int i = 1 ; i < size; i++ ){
 
-        auto & last =   res.back(); 
+        auto & last = res.back();  // last element
         int start = intervals[i][0];
 
         if ( start <= last[1])

@@ -19,6 +19,7 @@
 #include "lib/DisJointSet.h"
 #include "lib/LinkedList.h"
 
+using namespace std;
 
 
 class PatternsToSolveLeetCode8
@@ -68,7 +69,9 @@ public:
       // Modified Binary Search
       int search(vector<int>& nums, int target)
       {
-
+            //Input: nums = [4,5,6,7,0,1,2], target = 0
+            //Output: 4
+            
             int size = nums.size();
             int left = 0;
             int right = size - 1;
@@ -80,19 +83,50 @@ public:
                   if (nums[mid] == target)
                         return mid;
 
+                  //one side has to be sorted
                   if (nums[left] <= nums[mid])                          // left sorted can do binary search
-                        if (nums[left] <= target && target < nums[mid]) // on left
-                              right = mid - 1;
+                        if (nums[left] <= target && target < nums[mid]) // binary search on search 
+                              right = mid - 1; //i exists  all sorted from here
                         else
-                              left = mid + 1; // on right
-                  else                        // right sorted
-                        if (nums[mid] < target && target <= nums[right])
+                              left = mid + 1; // not sorted part
+                  else    // right sorted
+                        if (nums[mid] < target && target <= nums[right]) // binary search on right 
                               left = mid + 1;
                         else
                               right = mid - 1;
             }
             return -1;
       }
+
+      int findMin(vector<int>& nums) {
+      
+            //Input: nums = [3,4,5,1,2]
+            //Output: 1
+            int left = 0;
+            int right = nums.size() -1;
+            int minVal = numeric_limits<int>::max();
+
+            while (left <= right){
+                  
+                  int mid = left + (right -left)/2;
+
+                  if (nums[left] <= nums[right]) {
+                        minVal = min(minVal, nums[left]);
+                        break;
+                  }
+            
+                  if (nums[left] <= nums[mid]){ //left sorted
+                        minVal = min(minVal,nums[left]);
+                        left = mid+1;
+                  }
+                  else{
+                        minVal = std::min(minVal,nums[mid]);
+                        right = mid -1;
+                  }
+            }
+            return minVal;
+      }
+
       // K largest from vector
       vector<int> kLargestElements(vector<int>& nums, int k)
       {
@@ -177,7 +211,7 @@ public:
             }
 
             queue<int> queue;
-            for (int i = 0 ; i < numCourses; i ++) //starying points
+            for (int i = 0 ; i < numCourses; i ++) //starting points indegree = 0 
                    if (inDegree[i] == 0)
                         queue.push(i);
 
@@ -198,6 +232,51 @@ public:
       }
 
 
+      bool hasCycleDFS(vector<vector<int>> & adjList, int i,vector<int> & visited, vector<int> & res  ){
+
+            visited[i] = 1 ;
+
+            for (auto next : adjList[i]){
+
+                  if (visited [next] == 1)
+                        
+                        return true;
+                  if (visited [next] == 0)
+                        if (hasCycleDFS(adjList,next,visited,res))
+                              return true;
+            }
+
+            visited[i] = 2;
+            res.push_back(i);
+            return false;
+      }
+
+      vector<int> findOrderDFS(int numCourses, vector<vector<int>>& prerequisites) {
+
+            vector<int> visited(numCourses,0);
+
+            vector<vector<int>> adjList(numCourses);
+
+            vector<int> res;
+            res.reserve(numCourses);
+
+            for (auto pre:prerequisites)
+                  adjList[pre[1]].push_back(pre[0]);
+
+
+            for (int i = 0; i < numCourses; i++)
+                  if (visited[i] == 0)
+                        if (hasCycleDFS(adjList,i,visited,res))
+                              return vector<int>{};
+
+            std::reverse(res.begin(),res.end());
+            
+            return  res;
+
+
+      }
+
+
 
       vector<vector<int>> subsets(vector<int>& nums)
       {
@@ -209,18 +288,14 @@ public:
 
       vector<vector<int>> levelOrder(TreeNode* root)
       {
-
             vector<vector<int>> result;
             if (!root)
                   return result;
 
             queue<TreeNode*> queue;
-
             queue.push(root);
 
-            while (!queue.empty())
-            {
-
+            while (!queue.empty()) {
                   int size = queue.size();
                   vector<int> level;
 

@@ -1008,13 +1008,84 @@ return {};
       // 10. Binary Tree Traversal
 
       vector<string> binaryTreePaths(TreeNode* root)
-      {
 
+      {
             // Input: root = [1,2,3,null,5]
             // Output: ["1->2->5","1->3"]
 
             return {};
       }
 
+      void permuteDFS(vector<int>& nums,vector<int> & visited,vector<int> & curr,vector<vector<int>> & results) {
+
+            if (curr.size() == nums.size())
+                  results.push_back(curr);
+
+            for (int i = 0; i < nums.size(); i++){
+
+                  if (visited[i] == 0){
+
+                        visited[i] = 1;
+                        curr.push_back(nums[i]);
+                        permuteDFS(nums, visited,curr, results);
+                        curr.pop_back();
+                        visited[i] = 0;
+                  }
+            }
+            return;
+      }
+
+      vector<vector<int>> permute(vector<int>& nums) {
+      
+            vector<vector<int>> results;
+            vector<int> curr;
+            curr.reserve(nums.size());
+
+            vector<int> visited(nums.size(),0);
+
+            permuteDFS(nums, visited,curr, results);
+
+            return results;
+      }
+
+
+      void subsetsDFS(vector<int>& nums,int index, vector<int> & current,  vector<vector<int>> & result) {
+
+      
+            if (index == nums.size() ){
+                  result.push_back(current);
+                  return;
+            }
+
+            //exclude
+            subsetsDFS(nums,index +1,current,result);
+            
+            current.push_back(nums[index]);
+
+            subsetsDFS(nums,index +1,current,result); 
+
+            current.pop_back();
+
+      }
+      
+      
+      vector<vector<int>> subsets(vector<int>& nums) {
+
+            vector<vector<int>> result;
+
+            vector<int> current;
+            current.reserve(nums.size());
+
+            subsetsDFS(nums,0,current,result);
+
+            return result;
+
+
+      }
+
+
+
+
 
 };
+
