@@ -1028,6 +1028,7 @@ return {};
                         visited[i] = 1;
                         curr.push_back(nums[i]);
                         permuteDFS(nums, visited,curr, results);
+                        //backtrack 
                         curr.pop_back();
                         visited[i] = 0;
                   }
@@ -1051,7 +1052,7 @@ return {};
 
       void subsetsDFS(vector<int>& nums,int index, vector<int> & current,  vector<vector<int>> & result) {
 
-      
+            //beyond tree
             if (index == nums.size() ){
                   result.push_back(current);
                   return;
@@ -1060,10 +1061,12 @@ return {};
             //exclude
             subsetsDFS(nums,index +1,current,result);
             
+            //include
             current.push_back(nums[index]);
-
+            // we add dfs call and remove 
             subsetsDFS(nums,index +1,current,result); 
-
+            
+            //backtrack remove item 
             current.pop_back();
 
       }
@@ -1083,6 +1086,73 @@ return {};
 
       }
 
+      // 15. DP - Dynamic Programming 
+      
+      //compare the 2 strings from left to right 
+      // if s1[i] == s2[i]
+            // dp[i][j] = 1 + dp[i+1][j+1]; // +1 and calculate the next charcter DP 
+      //else //case when  not equal excluding each character 
+            //dp[i][j] = max(dp[i][j+1] , dp[i+1][j]) // exculding 1 from each string
+
+      //dp[i][j]. matrix representation dp[len] base 
+      //base cases:
+            //base cases are needed for starting point for the formuala
+            // when i / j = length(s1/s2) empty strings 
+            //dp[len(s1)][j] 0 for all j in the matrix
+            //dp[len(i)][s2] 0 for all i in the matrix
+            //we populate the dp matrix from smallest subproblem  dp[len(s1)-1][len(s2)-1]  
+      int longestCommonSubsequence(string text1, string text2) {
+      
+            int size1 = text1.size();
+            int size2 = text2.size();
+
+            vector<vector<int>> lcs(size1+1,vector<int>(size2+1,0));
+
+            for (int i = size1-1; i >=0; i--)
+                  for (int j = size2-1; j >=0;  j--){
+                        if (text1[i] == text2[j])
+                              lcs[i][j] = 1 + lcs[i+1][j+1];
+                        else  
+                              lcs[i][j] = max(lcs[i][j+1] , lcs[i+1][j]);
+                  }
+
+            return lcs[0][0];
+      }
+
+      int lcsRec(string & text1, string & text2,int i , int j,vector<vector<int>> & dp) {
+            
+            if (i < 0 || j < 0)
+                  return 0;
+
+            if (dp[i][j] != -1 )
+                  return dp[i][j];
+
+            if (text1[i] == text2[j])
+                  return dp[i][j] = 1 +  lcsRec(text1, text2 ,i-1 , j-1, dp);
+            else  
+                  return dp[i][j] = max(lcsRec(text1, text2 ,i , j-1, dp) , lcsRec(text1, text2 ,i-1 , j, dp));
+      
+      }
+
+      //recursive solution which is basically a mirror of DP
+      int longestCommonSubsequenceRec(string text1, string text2) {
+
+            int size1 = text1.size();
+            int size2 = text2.size();
+
+      
+            vector<vector<int>> dp(size1,vector<int>(size2,-1));
+            
+            return  lcsRec(text1, text2 ,size1-1 , size2-1, dp);
+      
+      
+      }
+
+      int lengthOfLIS(vector<int>& nums) {
+
+      
+            return 0;
+      }
 
 
 

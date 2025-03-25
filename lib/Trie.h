@@ -9,8 +9,9 @@ using namespace std;
 // TrieNode class definition
 class TrieNode {
 public:
-    bool isEndOfWord;
-    unordered_map<char, TrieNode*> children;
+    bool isEndOfWord; //represents end of search
+    unordered_map<char, TrieNode*> children; //represents the graph node with 
+    //char as key ever char is a child with many children 
 
     // Constructor for TrieNode
     TrieNode() : isEndOfWord(false) {}

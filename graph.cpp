@@ -692,19 +692,18 @@ int climbingStairsHelper(int n,vector<int> & memo) {
 //Bottom up DP
 int climbingStairsV2(int n) {
     
-      vector<int> memo(n+1,0); 
+      vector<int> dp(n+1,0); 
 
-      memo[1] = 1;
-      memo[2] = 2;
-
+      dp[1] = 1;
+      dp[2] = 2;
 
       for (int i =3; i <= n; i++ )
-            memo[i] = memo[i-2] +memo[i-1];
+            dp[i] = dp[i-2] + dp[i-1];
 
-      return memo[n];
+      return dp[n];
 }
 
-//optimization 2 variable no vector
+//optimization 2 variable no vector since we only need dp[n]
 int climbingStairsV3(int n) {
     
       if (n<=2)
@@ -856,12 +855,21 @@ int matrixPathwaysV2(int m, int n) {
 }
 
 //Coding Interview Patterns - Dynamic Programming Pg. 329
+
+//compare the 2 strings from left to right 
 // if s1[i] == s2[i]
-      // dp[i][j] = 1 + dp[i+1][j+1]; 
+      // dp[i][j] = 1 + dp[i+1][j+1]; // +1 and calculate the next charcter DP 
 //else
       //case when  not equal excluding each character 
-      //dp[i][j] = max(dp[i][j+1] , dp[i+1][j])
-//
+      //dp[i][j] = max(dp[i][j+1] , dp[i+1][j]) // exculding 1 from each string
+
+      //dp[i][j]. matrix representation dp[len] base 
+//base cases:
+      // when i / j = length(s1/s2) empty strings 
+      //dp[len(s1)][j] 0 for all j in the matrix
+      //dp[len(i)][s2] 0 for all i in the matrix
+      //we populate the dp matrix from smallest subproblem  dp[len(s1)-1][len(s2)-1]
+      
 int longest_common_subsequence(const std::string& s1, const std::string& s2) {
     
       int s1Size = s1.size();
@@ -902,6 +910,7 @@ int longest_common_subsequenceV2(const std::string& s1, const std::string& s2) {
 
     return prev[0]; // Placeholder return
 }
+
 
 //Coding Interview Patterns - Dynamic Programming Pg. 334
 
@@ -944,6 +953,9 @@ string longestPalindromeCodingInterview(string s) {
       
       return s.substr(start,maxLen);
 }
+
+
+
 
 
 //optimized version expand from base cases
