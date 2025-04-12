@@ -8,7 +8,7 @@ class DisJointSet {
 private:
     vector<int> parent;
     vector<int> root;
-    vector<int> rank;
+    vector<int> rank; //rank is 0 in the begining  
 
 public:
     // Constructor initializes parent and root with values from 0 to n-1

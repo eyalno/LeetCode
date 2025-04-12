@@ -672,7 +672,6 @@ return {};
      
       vector<int> nextSmallerElement(vector<int>& nums) {
 
-           
             vector<int> res(nums.size(),-1);
 
             stack<int> s;
@@ -687,7 +686,6 @@ return {};
             }
             return res;
       }
-     
      
       vector<int> nextGreaterElement(vector<int>& nums1, vector<int>& nums2)
       {
@@ -791,7 +789,6 @@ return {};
 
       vector<int> topKFrequent(vector<int>& nums, int k)
       {
-
             unordered_map<int, int> freqMap;
             vector<int> result;
             for (int num : nums)
@@ -823,7 +820,6 @@ return {};
 
       vector<int> topKFrequentBucketSort(vector<int>& nums, int k)
       {
-
             vector<int> result;
             unordered_map<int, int> freqMap;
             int size = nums.size();
@@ -853,7 +849,6 @@ return {};
 
       vector<vector<int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k)
       {
-
             vector<vector<int>> result;
 
             struct heapStruct
@@ -896,7 +891,6 @@ return {};
 
       vector<vector<int>> kSmallestPairsEfficent(vector<int>& nums1, vector<int>& nums2, int k)
       {
-
             vector<vector<int>> result;
 
             int m = nums1.size();
@@ -1016,6 +1010,97 @@ return {};
             return {};
       }
 
+      // 11. DFS
+
+      //amazon hacker rank demo 
+      
+      void countGroupsDFS(vector<string> related,int i,vector<int> & visited) {
+      
+            visited[i] = 1;
+
+            for (int j = 0; j < related.size(); j++ )
+                  if (related[i][j] == '1' && visited[j] == 0)
+                     countGroupsDFS(related, j,visited);
+      }                 
+      
+      int countGroups(vector<string> related) {
+
+            int size = related.size();
+
+            vector<int> visited(size,0);
+            int groupCount = 0;
+            for (int i =0 ; i < size; i ++ ){
+                  if (visited[i] == 0){
+                        countGroupsDFS(related, i,visited);
+                        groupCount++;
+                  }
+            }
+            return groupCount;
+      }
+
+      class CountGroupsDisJointSet 
+      {
+         public:
+            vector<int> parent;
+            vector<int> rank;
+      
+            int find(int x){
+                  if (x != parent[x])
+                        parent[x] = find(parent[x]);
+                  
+                  return parent[x];
+            }
+      
+            bool unite(int x , int y){
+
+                  int rootX = find(x);
+                  int rootY = find(y);
+
+                  if (rootX != rootY){
+
+                        if (rank[rootX] > rank[rootY])
+                              parent[rootY]  =rootX ;
+                        else if (rank[rootX] <  rank[rootY])
+                              parent[rootX]  =rootY ;
+                        else {
+                              parent[rootY]  =rootX ;
+                              rank[rootX]++;
+                        }
+                        return true;
+                  }
+                  return false;
+            }
+
+            int countGroupsDisJointSetF(vector<string> related) {
+
+                  int size = related.size();
+                  
+                  for (int i = 0; i < size; i ++){
+                        parent.push_back(i);
+                        rank.push_back(0);
+                  }
+
+                  for (int i =0;  i < size; i ++)
+                        for (int j =0;  j < size; j ++)
+                              if (related[i][j] =='1')
+                                    unite(i,j);
+
+                  unordered_set<int> groups;
+                  for (int i =0;  i < size; i ++)
+                        groups.insert(find(parent[i]));
+                  
+                  return groups.size();
+            }
+      };
+      
+
+     
+
+
+
+
+
+      // 14. Backtracking
       void permuteDFS(vector<int>& nums,vector<int> & visited,vector<int> & curr,vector<vector<int>> & results) {
 
             if (curr.size() == nums.size())
@@ -1070,7 +1155,6 @@ return {};
             current.pop_back();
 
       }
-      
       
       vector<vector<int>> subsets(vector<int>& nums) {
 
