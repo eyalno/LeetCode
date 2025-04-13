@@ -1014,6 +1014,32 @@ return {};
 
       //amazon hacker rank demo 
       
+      vector<int> minimalHeaviestSetA(vector<int> arr) {
+            int size = arr.size();
+            vector<int> result;
+        
+            sort(arr.begin(), arr.end());  // sort ascending
+        
+            vector<int> sumArr(size, 0);
+            sumArr[0] = arr[0];
+            for (int i = 1; i < size; i++)
+                sumArr[i] = arr[i] + sumArr[i - 1];
+        
+            int i = size - 1;
+            for (; i >= 0; i--) {
+                int a = sumArr[size - 1] - (i > 0 ? sumArr[i - 1] : 0);
+                int b = (i > 0 ? sumArr[i - 1] : 0);
+                if (a > b)
+                    break;
+            }
+        
+            for (int j = i; j < size; j++)
+                result.push_back(arr[j]);
+        
+            return result;
+        }
+
+
       void countGroupsDFS(vector<string> related,int i,vector<int> & visited) {
       
             visited[i] = 1;
