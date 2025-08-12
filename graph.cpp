@@ -109,21 +109,60 @@ unordered_map<GraphNode*, GraphNode*> visited;
 
 GraphNode* cloneGraph(GraphNode* node)
 {
+      //Pre DFS return visited or end
+      //return  go back 
+      //end of graph
       if (!node)
             return nullptr;
 
+      //node cloned
       if (visited.find(node) != visited.end())
             return visited[node];
 
       GraphNode* newNode = new GraphNode(node->val);
       visited[node] = newNode;
 
+      
       for (const auto& neighbor : node->neighbors)
       {
-            newNode->neighbors.push_back(cloneGraph(neighbor));
+            newNode->neighbors.push_back(cloneGraph(neighbor)); //step .. return connect
       }
+      
+      // post DFS on level    
+      return newNode;  //return current level 
+}
 
-      return newNode;
+// 113. Path Sum II
+
+void pathSumDFS(TreeNode* node, int targetSum, vector<int> & currPath,vector<vector<int>> & result  ) {
+
+      if (node == nullptr)
+            return;
+      
+      currPath.push_back(node->val);
+      
+      if (!node->left && !node->right && targetSum == node->val ){
+                  result.push_back(currPath);
+      }
+                  
+      pathSumDFS(node->left, targetSum - node->val , currPath,result );
+      
+      pathSumDFS(node->right, targetSum - node->val , currPath,result );
+      // after 2 null pop and go up the tree 
+      
+      currPath.pop_back();
+
+}
+
+ vector<vector<int>> pathSum(TreeNode* root, int targetSum) {
+        
+      vector<vector<int>> result;
+      vector<int> currPath;
+      
+      pathSumDFS(root, targetSum, currPath,result );
+      
+      return result;
+        
 }
 
 

@@ -1012,7 +1012,7 @@ return {};
 
       // 11. DFS
 
-      //amazon hacker rank demo 
+      //amazon - "Hacker Rank Demo" 
       
       vector<int> minimalHeaviestSetA(vector<int> arr) {
             int size = arr.size();
