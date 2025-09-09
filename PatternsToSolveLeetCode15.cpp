@@ -80,6 +80,37 @@ private:
             return maxLength;
       }
 
+       //amazon - "Hacker Rank Demo" 
+      
+      //prefix sum pattern
+      vector<int> minimalHeaviestSetA(vector<int> arr) {
+            
+            
+            int size = arr.size();
+            vector<int> result;
+            if(size == 0 )
+                  return result;
+            sort(arr.begin(), arr.end());  // sort ascending
+        
+            vector<long long> sumArr(size, 0);
+            sumArr[0] = arr[0];
+            for (int i = 1; i < size; i++)
+                sumArr[i] = arr[i] + sumArr[i - 1];
+        
+            int i = size - 1;
+            for (;  i >= 0; i--) {
+                long long a = sumArr[size - 1] - (i > 0 ? sumArr[i - 1] : 0);
+                long long b = (i > 0 ? sumArr[i - 1] : 0);
+                if (a > b)
+                    break;
+            }
+        
+            for (int j = i; j < size; j++)
+                result.push_back(arr[j]);
+        
+            return result;
+        }
+
       int subarraySum(vector<int>& nums, int k)
       {
             int size = nums.size();
@@ -1012,35 +1043,10 @@ return {};
 
       // 11. DFS
 
+     
+
       //amazon - "Hacker Rank Demo" 
-      
-      vector<int> minimalHeaviestSetA(vector<int> arr) {
-            int size = arr.size();
-            vector<int> result;
-        
-            sort(arr.begin(), arr.end());  // sort ascending
-        
-            vector<int> sumArr(size, 0);
-            sumArr[0] = arr[0];
-            for (int i = 1; i < size; i++)
-                sumArr[i] = arr[i] + sumArr[i - 1];
-        
-            int i = size - 1;
-            for (; i >= 0; i--) {
-                int a = sumArr[size - 1] - (i > 0 ? sumArr[i - 1] : 0);
-                int b = (i > 0 ? sumArr[i - 1] : 0);
-                if (a > b)
-                    break;
-            }
-        
-            for (int j = i; j < size; j++)
-                result.push_back(arr[j]);
-        
-            return result;
-        }
-
-
-      void countGroupsDFS(vector<string> related,int i,vector<int> & visited) {
+      void countGroupsDFS(vector<string> & related,int i,vector<int> & visited) {
       
             visited[i] = 1;
 
@@ -1049,7 +1055,7 @@ return {};
                      countGroupsDFS(related, j,visited);
       }                 
       
-      int countGroups(vector<string> related) {
+      int countGroups(vector<string> & related) {
 
             int size = related.size();
 
@@ -1119,13 +1125,6 @@ return {};
             }
       };
       
-
-     
-
-
-
-
-
       // 14. Backtracking
       void permuteDFS(vector<int>& nums,vector<int> & visited,vector<int> & curr,vector<vector<int>> & results) {
 
