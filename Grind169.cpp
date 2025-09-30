@@ -473,11 +473,8 @@ void moveZeroes1(vector<int>& nums) {
             if (nums[i] != 0)
                 nums[curr++] = nums[i];
         }
-        
-        
+             
         for (int i = curr; i <size; i++)
             nums[i] =0;
-
-
 
     }
