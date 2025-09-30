@@ -461,4 +461,23 @@ string longestPalindromeAmazon(string s) {
 }
 
 
+//283. Move Zeroes
 
+void moveZeroes(vector<int>& nums) {
+        
+        int size = nums.size();
+        int curr = 0;
+        
+        for (int i =0; i < size ; i++){
+
+            if (nums[i] != 0)
+                nums[curr++] = nums[i];
+        }
+        
+        
+        for (int i = curr; i <size; i++)
+            nums[i] =0;
+
+
+
+    }
