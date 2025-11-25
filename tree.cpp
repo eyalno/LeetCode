@@ -729,7 +729,7 @@ bool hasPathSum(TreeNode* root, int targetSum)
       */
 }
 
-
+//checking is level symmetrry . propgate up 
 bool isMirror(TreeNode* t1, TreeNode* t2)
 {
 

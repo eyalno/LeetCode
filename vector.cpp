@@ -1,6 +1,6 @@
-#include <iostream>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 #include <string>
 #include <map>
 #include <queue>
@@ -1547,3 +1547,58 @@ bool canAttendMeetings(vector<vector<int>>& intervals)
 
       return true;
 }
+//Sₙ = n/2 × (a₁ + aₙ)
+
+//Intuition create pairs forward and backward the sum / 2
+//268. Missing Number71.1%Easy
+int missingNumber(vector<int>& nums) {
+
+
+
+int n = nums.size();
+
+int sum = 0;
+int seriesSum = (n* (n+1))/2;  //trancation last /2 multiply first 
+
+for (int num:nums)
+      sum += num;
+
+      return seriesSum - sum;
+
+}
+
+
+ bool isPalindrome(int x) {
+
+      if ((x<  0 ) || (x%10 == 0 && !x)) //e.g 40 never 
+            return false;
+      
+      int num = x ;
+      int reversed = 0;
+      
+      while(num){
+            reversed = reversed * 10 + num%10; 
+            
+            num /= 10;
+      }
+      return (reversed == x) ? true:false;
+            
+
+ }
+
+ //avoid overflow . Max int. = 2,147,483,647 if we reverse it is bigger
+
+  bool isPalindromeOF(int x) {
+
+      if ((x<  0 ) || (x%10 == 0 && x)) //e.g 40 never 
+            return false;
+      
+      int reversed = 0;
+      
+      while (x > reversed){ //finding half since we are chopping x  
+            reversed =  reversed*10 +  x%10;
+            x/=10;
+      }
+
+      return x == reversed || x == (reversed/10) ;
+ }
