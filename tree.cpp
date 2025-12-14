@@ -1078,3 +1078,27 @@ public:
             return result;
       }
 };
+
+
+//108. Convert Sorted Array to Binary Search Tree
+
+//splitting the array from the middle
+TreeNode*  sortedArrayToBSTHelper(vector<int>& nums,int startIdx , int endIdx   ) {
+ 
+      if (startIdx > endIdx) //branch even can create 1 node only overlap returns null  
+            return nullptr;
+      
+      int mid = startIdx + (endIdx - startIdx) / 2; // avoids overflow. 
+      
+      TreeNode* treeNode = new TreeNode(nums[mid]); // every rec call creates a node
+
+      treeNode ->left  = sortedArrayToBSTHelper(nums,startIdx,mid -1); //build tree on rec return 
+      treeNode ->right = sortedArrayToBSTHelper(nums,mid + 1,endIdx);
+      return treeNode; 
+
+}
+
+TreeNode* sortedArrayToBST(vector<int>& nums) {
+      
+     return sortedArrayToBSTHelper(nums, 0 ,nums.size() -1);
+}

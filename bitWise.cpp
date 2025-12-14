@@ -248,3 +248,17 @@ int majorityElement(vector<int>& nums)
       return nums[nums.size()/2];
       */
 }
+
+
+int reverseBits(int n) {
+ 
+      
+      for (int i =0 ; i< 16; i ++){
+            
+
+
+      }
+
+
+
+}
