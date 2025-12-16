@@ -1022,3 +1022,25 @@ string longestPalindromeV2(string s) {
 
 
 }*/
+
+
+
+int updateMatrixDFS(vector<vector<int>>& mat, int i, int j){
+
+
+}
+
+vector<vector<int>> updateMatrix(vector<vector<int>>& mat) {
+
+      vector<vector<int>> result(mat.size(),vector<int>(mat[0].size())) ; 
+      
+      for (int i =0 ; i < mat.size(); i ++) // rows
+            for (int j =0 ; j< mat[0].size(); j ++) // first row size of coulmun vector
+                  if (mat[i][j] == 1)
+                        
+                  else
+                        result[i][j] = 0; //reduadnat since all values initilized to 0 
+
+      
+
+}

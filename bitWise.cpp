@@ -249,16 +249,40 @@ int majorityElement(vector<int>& nums)
       */
 }
 
-
+//Brute force
+//take 1 bit at a time to a new variable and move it . imagine a sneak 
 int reverseBits(int n) {
  
-      
-      for (int i =0 ; i< 16; i ++){
-            
+          unsigned int r = 0;
+      for (int i = 0 ; i< 32; i ++){
 
-
+            r = (r << 1) | (n & 1);  // taking right most bit and adding to r after moving by 1 
+            n >>=1; // remove first bit
       }
-
-
-
+      return r;
 }
+
+//look up table 1 byte   
+
+int rev8[256];
+
+//take 1 bit at a time to a new variable and move it . imagine a sneak 
+void initRev8(){
+
+      for (int i = 0; i < 256; i++){
+            unsigned int r =0;
+            int x = i;
+            for (int j =0  ;  j < 8 ; j++){
+                  r = (r << 1) | (x & 1);
+                  x>>=1;
+            } 
+            rev8[i] = r;
+      }
+}
+
+int reverseBitsLUT(int n) {
+    initRev8();
+    return  rev8[n >> 24 & 0XFF  ]   | rev8[n>>16 & 0XFF]<<8  | rev8[n>>8 & 0XFF]<<16 | rev8[n &  0XFF] <<24 ;
+}
+
+  

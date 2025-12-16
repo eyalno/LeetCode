@@ -1086,19 +1086,51 @@ public:
 TreeNode*  sortedArrayToBSTHelper(vector<int>& nums,int startIdx , int endIdx   ) {
  
       if (startIdx > endIdx) //branch even can create 1 node only overlap returns null  
-            return nullptr;
+            return nullptr; //every return is a node created
       
       int mid = startIdx + (endIdx - startIdx) / 2; // avoids overflow. 
       
       TreeNode* treeNode = new TreeNode(nums[mid]); // every rec call creates a node
 
-      treeNode ->left  = sortedArrayToBSTHelper(nums,startIdx,mid -1); //build tree on rec return 
+      treeNode ->left  = sortedArrayToBSTHelper(nums,startIdx,mid -1); //build tree on rec return make connections
       treeNode ->right = sortedArrayToBSTHelper(nums,mid + 1,endIdx);
-      return treeNode; 
+      return treeNode; // connection to calling node
 
 }
 
 TreeNode* sortedArrayToBST(vector<int>& nums) {
       
      return sortedArrayToBSTHelper(nums, 0 ,nums.size() -1);
+}
+
+	//•	Outer recursion: search
+	//•	Inner recursion: verify equality
+
+
+bool isIdentical (TreeNode* root, TreeNode* subRoot) {
+      if (!root && !subRoot )
+            return true;
+      
+      if ( (root && !subRoot) || (!root && subRoot) )
+            return false;
+
+      if (root->val != subRoot->val)
+            return false;
+
+      return isIdentical (root->left,subRoot->left) && isIdentical (root->right,subRoot->right);
+      
+}
+
+bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+      if (!subRoot)
+            return true;
+      
+      if (!root)
+            return false;
+
+      if  (isIdentical(root,subRoot) )
+            return true;
+      
+      return isSubtree (root->left,subRoot) || isSubtree (root->right,subRoot);
+
 }
