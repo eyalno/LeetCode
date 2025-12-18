@@ -1602,3 +1602,7 @@ for (int num:nums)
 
       return x == reversed || x == (reversed/10) ;
  }
+
+
+
+ 

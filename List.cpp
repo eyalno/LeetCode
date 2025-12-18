@@ -34,28 +34,26 @@ ListNode* middleNodeHelper(ListNode* slow, ListNode* fast)
       return middleNodeHelper(slow->next, fast->next->next);
 }
 
-ListNode* middleNode(ListNode* head)
-{
 
+//For odd length:  slow lands exactly in the middle.  fast last node
+//For even length: slow lands on the second middle (as required) fast - null
+ListNode* middleNode(ListNode* head){
       // recursive
       if (!head || !head->next)
             return head;
 
-      return middleNodeHelper(head, head->next);
+      ListNode* slow = middleNodeHelper(head, head->next);
+      
+      //Fast runs twice as fast as slow; when fast is done, slow is halfway.
+      //slow fast pointers
+      slow = head;
+      ListNode *  fast = head;
 
-      /*slow fast pointers
-      ListNode* slow = head ,*fast = head;
-
-
-      while (fast && fast->next){
-
+      while (fast && fast->next){ // fast stops on the last node
             fast = fast->next->next;
-
             slow = slow->next;
       }
-
       return slow;
-      */
 }
 
   ListNode* rotateRight(ListNode* head, int k)
@@ -373,7 +371,6 @@ ListNode* middleNode(ListNode* head)
      ListNode* reverseList(ListNode* head);
       bool isPalindrome(ListNode* head)
       {
-
             // 2 pointers
 
             ListNode* slow = head, * fast = head;
@@ -519,7 +516,6 @@ ListNode* middleNode(ListNode* head)
 
       ListNode* reverseList(ListNode* head)
       {
-
             // iterative
 
             /*
@@ -538,16 +534,17 @@ ListNode* middleNode(ListNode* head)
                   return prev;
             */
 
-            // recursive
+      // recursive reverse list
+      // the previous node is saved on stack
 
-            if (!head || !head->next)
-                  return head;
+            if (!head || !head->next) // if empty list or 1 node . when reaches last node return it 
+                  return head; 
 
-            ListNode* p = reverseList(head->next);
-            head->next->next = head;
-            head->next = nullptr;
+            ListNode* p = reverseList(head->next); //recursive step . 
+            head->next->next = head; // reverse action - the next node next point to current  
+            head->next = nullptr;  // only for the end to attach nullptr. nulling the forward link. 
 
-            return p;
+            return p; // propgate the last node 
       }
 
       ListNode* removeNthFromEnd(ListNode* head, int n)
@@ -691,3 +688,58 @@ ListNode* middleNode(ListNode* head)
 
                 */
       }
+
+ListNode * reorderListMiddle(ListNode* head){
+
+      if (!head || !head->next)
+            return head;
+
+      ListNode * slow = head, * fast= head;
+      
+      while (fast && fast->next ){
+
+            slow = slow->next;
+            fast = fast->next->next; 
+      }
+      return slow;
+}
+
+ListNode * reorderListReverse(ListNode* head){
+
+      if (!head || !head->next)
+            return head;
+
+      ListNode * p =  reorderListReverse(head->next);
+      head->next->next = head;
+      head->next = nullptr;
+      return p;
+
+}
+// https://leetcode.com/problems/reorder-list/description/
+//143. Reorder List
+//[1,2,3,4,5]
+//[1,5,2,4,3]
+// combinning mirrors pairs 
+void reorderList(ListNode* head) {
+
+      ListNode * mid = reorderListMiddle(head); 
+
+      ListNode * second = mid ->next; // define second list as + 1
+      mid ->next = nullptr;  // nullying first list
+      
+      ListNode * reversed = reorderListReverse(second); //reversing second list
+
+      // 1 step 
+      while ( reversed  ){ // looping on the second since it is shorter due to + 1
+            //saving next - reserved temp
+            ListNode * next = head->next; 
+            ListNode * reversedNext = reversed->next;  
+            
+            head->next = reversed; //connecting head to reserved    
+            reversed->next = next; //reserved to begining second pair
+
+            // 1 step. 2 new list.
+            reversed = reversedNext;
+            head = next;
+      }
+}
