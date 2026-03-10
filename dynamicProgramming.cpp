@@ -39,3 +39,42 @@ int maxSubArray(vector<int>& nums) {
 
     return maxSum;
 }
+
+//https://leetcode.com/problems/longest-increasing-subsequence/description/
+
+//300. Longest Increasing Subsequence
+
+/*
+    Input: nums = [10,9,2,5,3,7,101,18]
+    Output: 4
+    Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+
+    State : dp[i] = length of the LIS ending at i
+    Transition: 
+            If nums[j] < nums[i]   
+    Reuse:
+            dp[i] = max(dp[i], dp[j] + 1) adding 1 more 
+
+*/
+
+int lengthOfLIS(vector<int>& nums) {
+
+    int size = nums.size();
+    if (size == 0) return 0;
+    
+    vector<int> dp(size,1); // for every index the minimum is 1
+    
+    int maxLength = 1;
+
+    //for every i we check if previous dp  If nums[j] < nums[i]  
+    for (int i = 1; i < size ; i++) //O(n^2)
+        for (int j = 0; j < i ; j++){
+            if (nums[i] > nums[j]){
+                dp[i] = max (dp[i], dp[j] +1);
+                maxLength = max (maxLength,dp[i]);
+            }
+        }
+
+return maxLength;
+    
+}
