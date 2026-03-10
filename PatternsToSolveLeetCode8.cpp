@@ -67,36 +67,36 @@ public:
       }
 
       // Modified Binary Search
-      int search(vector<int>& nums, int target)
-      {
-            //Input: nums = [4,5,6,7,0,1,2], target = 0
-            //Output: 4
-            
-            int size = nums.size();
-            int left = 0;
-            int right = size - 1;
+int search(vector<int>& nums, int target)
+{
+    int left = 0;
+    int right = nums.size() - 1;
 
-            while (left <= right)
-            {
-                  int mid = left + (right - left) / 2; //  == (left + right) /2
+    while (left <= right) //This ensures the last remaining element is also checked.
+    {
+        int mid = left + (right - left) / 2;
 
-                  if (nums[mid] == target)
-                        return mid;
+        if (nums[mid] == target)
+            return mid;
 
-                  //one side has to be sorted
-                  if (nums[left] <= nums[mid])                          // left sorted can do binary search
-                        if (nums[left] <= target && target < nums[mid]) // binary search on search 
-                              right = mid - 1; //i exists  all sorted from here
-                        else
-                              left = mid + 1; // not sorted part
-                  else    // right sorted
-                        if (nums[mid] < target && target <= nums[right]) // binary search on right 
-                              left = mid + 1;
-                        else
-                              right = mid - 1;
-            }
-            return -1;
-      }
+        // left half is sorted
+        if (nums[left] <= nums[mid]) { //  = to include all cases we don't check mid again  
+
+            if (nums[left] <= target && target < nums[mid]) //target found in sorted left 
+                right = mid - 1;          // search left
+            else
+                left = mid + 1;           // search right
+        }
+        else {                            // right half is sorted
+            if (nums[mid] < target && target <= nums[right]) //target found in sorted right 
+                left = mid + 1;           // search right
+            else
+                right = mid - 1;          // search left
+        }
+    }
+
+    return -1;
+}
 
       int findMin(vector<int>& nums) {
       
@@ -293,24 +293,24 @@ public:
                   return result;
 
             queue<TreeNode*> queue;
-            queue.push(root);
+            queue.push(root); //initilize the queue
 
-            while (!queue.empty()) {
-                  int size = queue.size();
-                  vector<int> level;
+            while (!queue.empty()) { 
+                  int size = queue.size(); // the size represents each level
+                  vector<int> level; 
 
-                  for (int i = 0; i < size; i++)
+                  for (int i = 0; i < size; i++) //process current level 
                   {
                         TreeNode* curr = queue.front();
-                        level.push_back(curr->val);
+                        level.push_back(curr->val); //build level by level
                         queue.pop();
-                        if (curr->left)
+                        if (curr->left) //adding to queue next level
                               queue.push(curr->left);
                         if (curr->right)
                               queue.push(curr->right);
                   }
 
-                  result.push_back(level);
+                  result.push_back(level); //add current level
             }
             return result;
       }

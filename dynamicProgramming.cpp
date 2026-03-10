@@ -61,20 +61,35 @@ int lengthOfLIS(vector<int>& nums) {
 
     int size = nums.size();
     if (size == 0) return 0;
-    
-    vector<int> dp(size,1); // for every index the minimum is 1
+
+    vector<int> dp(size,1); // for every index the minimum is 1 
+    // State    
     
     int maxLength = 1;
+    // we build base cases. iterative
 
     //for every i we check if previous dp  If nums[j] < nums[i]  
     for (int i = 1; i < size ; i++) //O(n^2)
         for (int j = 0; j < i ; j++){
-            if (nums[i] > nums[j]){
-                dp[i] = max (dp[i], dp[j] +1);
-                maxLength = max (maxLength,dp[i]);
+            if (nums[i] > nums[j]){ //Transition
+                dp[i] = max (dp[i], dp[j] +1);//Reuse
+                maxLength = max (maxLength,dp[i]); 
             }
         }
 
 return maxLength;
     
+}
+
+
+queue<int> queue;
+queue.push(1);
+
+while(!queue.empty()){
+
+    int course = queue.front();
+    queue.pop();
+
+    for (int next : adjList[course])
+        queue.push(next);
 }
