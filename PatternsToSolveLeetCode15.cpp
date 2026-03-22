@@ -123,7 +123,7 @@ private:
             {
                   sums[i] = sums[i - 1] + nums[i - 1];
             }
-            // looping and using the prefix sum to calculate sub array the brute force
+            // looping and using the pr   efix sum to calculate sub array the brute force
             //  is to to calculate for the range
             for (int i = 0; i < size; i++)
                   for (int j = i + 1; j <= size; j++)
@@ -676,12 +676,10 @@ return {};
       }
 
       // 6. Monotonic(increasing /decreasing)  Stack
-     
-      // decrease stack we store in the stack only numbers that we haven't find a greater number for them.
-      // and by that we are keeping the decrease stack when we do find greater number we pop and set everything.
+      //496. Next Greater Element I - for each element find the next greater
       vector<int> nextGreaterElement(vector<int>& nums) {
-            //[2, 1, 2, 4, 3]
-            //[4, 2, 4, -1, -1]
+            //[2, 1, 2, 4, 3] input
+            //[4, 2, 4, -1, -1] result
 
             //3,2,1,5
             //5,5,5,-1
@@ -689,14 +687,15 @@ return {};
             vector<int> res(nums.size(),-1);
             stack<int> s;
 
-            for (int i = 0; i < nums.size(); i++)
-            {     //we empty the stack completely since it has order and update all indicies 
-                  while ( !s.empty() && nums[i] > nums[s.top()]  ){ // we compare the current num to the entire stack              
-                        res[s.top()] = nums[i]; //replace with greater element
-                        s.pop(); 
+            for (int i = 0; i < nums.size(); i++) //looping only once on array
+            {  //compare the current num as long as it breaks the order          
+                  while ( !s.empty() && nums[i] > nums[s.top()]){       
+                        int idx = s.top(); //index of the the element that we found greater element
+                        s.pop(); // removing the index that we found the greater
+                        res[idx] = nums[i]; // current element is the next greater element 
+                        
                   }
-                  s.push(i); // we store index in stack till we find greater number
-
+                  s.push(i); // store index in stack till we find greater number
             }
             return res;
       }
@@ -989,6 +988,41 @@ return {};
             return res;
       }
 
+      //https://leetcode.com/problems/interval-list-intersections/
+      //986. Interval List Intersections
+
+    vector<vector<int>> intervalIntersection(vector<vector<int>>& firstList, vector<vector<int>>& secondList) {
+      
+      vector<vector<int>> res;
+
+      if (firstList.empty() || secondList.empty())
+            return res;   
+
+      for (int i = 0, j =0;  i < firstList.size() && j < secondList.size()  ; ){
+
+            int firstA = firstList[i][0];
+            int firstB = firstList[i][1];
+            
+            int secondA = secondList[j][0];
+            int secondB = secondList[j][1];
+
+            int start = max(firstA,secondA);
+            int end = min(firstB,secondB);
+            
+            if (start <= end){ // start < end no intersection
+                  res.push_back({start,end});
+            }
+            
+            firstB  < secondB? i++: j++;  //Move the interval that ends first:
+                  
+      }
+
+      return res;
+      
+    }
+
+    //https://leetcode.com/problems/insert-interval/description/
+    //57. Insert Interval
       vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval)
       {
 
@@ -1266,5 +1300,5 @@ return {};
 
 
 
-};
 
+};

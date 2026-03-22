@@ -81,15 +81,3 @@ return maxLength;
     
 }
 
-
-queue<int> queue;
-queue.push(1);
-
-while(!queue.empty()){
-
-    int course = queue.front();
-    queue.pop();
-
-    for (int next : adjList[course])
-        queue.push(next);
-}

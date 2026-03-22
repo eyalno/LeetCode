@@ -63,3 +63,69 @@ public:
 };
 
 #endif // TRIE_H
+
+
+
+
+
+
+class TrieNode {
+public:
+    bool isWord;
+    TrieNode* children[26];
+
+    TrieNode() {
+        isWord = false; // at every node indicates if its a word.
+        memset(children, 0, sizeof(children));  //setting all pointers to 0 
+    }
+};
+
+class Trie {
+private:
+    TrieNode* root;
+public:
+    Trie() {
+        root = new TrieNode();
+    }
+    
+    void insert(string word) { //insert new word
+        TrieNode* node = root;
+
+        for (char c : word) { // looping on word.
+            int index = c - 'a';
+
+            if (!node->children[index]) {
+                node->children[index] = new TrieNode(); // creates the new character 
+            }
+            node = node->children[index]; //setting the new node to be current
+        }
+        node->isWord = true; // setting the word on last node
+    }
+
+    bool search(string word) {// Search full word
+        TrieNode* node = root;
+
+        for (char c : word) { //same looping logic now just comparing 
+            int index = c - 'a';
+
+            if (!node->children[index]) {
+                return false;
+            }
+            node = node->children[index];
+        }
+        return node->isWord;
+    }
+    bool startsWith(string prefix) {// Prefix search same loop as search without checking word
+        TrieNode* node = root;
+
+        for (char c : prefix) { 
+            int index = c - 'a';
+
+            if (!node->children[index]) {
+                return false;
+            }
+            node = node->children[index];
+        }
+        return true;
+    }
+};

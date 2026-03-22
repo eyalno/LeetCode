@@ -41,6 +41,7 @@ public:
     }
 
     // Quick Find: returns the root of x (O(1) time)
+    //not doing compression
     int quickFind(int x) {
         return root[x];
     }
@@ -79,33 +80,33 @@ public:
             parent[rootB] = rootA;
     }
 
-    // Union by Rank: unites the sets containing a and b (O(1) time)
+    // Union by Rank: unites the sets containing a and b (O(1) time) 
+    // We attach one root under the other root - both will have the same root 
     bool unionbyRank(int a, int b) {
-        int rootA = findPathCompression(a); // can be O(log n)
+        int rootA = findPathCompression(a); // can be O(log n) or O (1)
         int rootB = findPathCompression(b);
 
-        if (rootA == rootB)
+        if (rootA == rootB) 
             return false;
 
-        if (rootA != rootB) {
-            if (rank[rootA] > rank[rootB])
-                root[rootB] = rootA;
-            else if (rank[rootB] > rank[rootA])
-                root[rootA] = rootB;
-            else {
-                rank[rootA]++;
-                root[rootB] = rootA;
-            }
+        if (rank[rootA] > rank[rootB]) // attach lower rank tree under higher rank tree
+            root[rootB] = rootA;
+        else if (rank[rootB] > rank[rootA])
+            root[rootA] = rootB;
+        else { 
+            rank[rootA]++;  // rank increases since attaching will add rank by 1 other other cases no increase  
+            root[rootB] = rootA;  //when ranks are equal we pick one tree A root of B
         }
         return true;
     }
 
-    // Path compression: optimizes the find operation by making nodes point directly to the root
+    // Path Compression (optimization for find) : find the root of x
+    // we recursively find the root and make every node along the path point directly to the root.
     int findPathCompression(int x) {
-        if (x == root[x])
-            return x;
+        if (x == root[x]) //root found - no parent
+            return x;  
 
-        return root[x] = findPathCompression(root[x]);
+        return root[x] = findPathCompression(root[x]); //update and propgate the root in graph towards x
     }
 };
 
