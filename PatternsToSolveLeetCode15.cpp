@@ -413,9 +413,11 @@ return {};
       int maxAreaTwoPointers(vector<int>& height)
       {
 
-            // moving the shorter line inward
-            // by doing that we skip all permutuations that are not relevant since the shorter line always
-            // dominates the size of the container.
+           // Move the pointer at the shorter line.
+            // The shorter line limits the container height.
+            // Keeping it while reducing width cannot improve the area,
+            // so we skip all those pairs and look for a taller line instead.
+
             int max = 0;
             int size = height.size();
 
@@ -1296,9 +1298,619 @@ return {};
       
             return 0;
       }
+};
+
+
+class Solution {
+public:
+    int numSubarraysWithSum(vector<int>& nums, int goal) {
+        
+      unordered_map<int,int> freq;
+      int sum = 0;
+      int result =0; 
+      freq[0] = 1;
+
+      for (int num:nums){
+            sum+= num;
+
+            if (freq.count(sum - goal))
+                  result += freq[sum -goal];
+            
+            freq[sum ]++;
+      }
+      return result;
+
+    }
+};
+
+class Solution1 {
+public:
+    int findMaxLength(vector<int>& nums) {
+        
+      int size = nums.size();
+      unordered_map<int,int> freq;
+      freq[0] = 0;
+      int maxLen = 0;
+      int sum =0;
+
+      /*
+      vector<int> prefixSum(size + 1,0);
+
+      for (int i = 1; i <= size; i++ )
+            prefixSum[i] = prefixSum[i-1] + (nums[i-1] == 0 )?-1:1;     
+*/
+
+      for (int i = 0; i < size; i++){
+            sum += (nums[i] == 0 )?-1:1;
+            
+            if (freq.count(sum)  )
+                  maxLen = max(maxLen, i-freq[sum] ); 
+            else  
+                  freq[sum] = i;
+            
+
+      }
+      return maxLen;
+
+        
+    }
+};
+
+class Solution {
+public:
+    bool checkSubarraySum(vector<int>& nums, int k) {
+        
+      unordered_map<int,int> freq;
+      freq[0] = -1;
+
+      int sum = 0;
+        
+      for (int i =0; i <  nums.size(); i ++){
+            sum += nums[i];
+            int mod = sum % k;
+
+            if (mod < 0) 
+                  mod +=k;  
+      
+            if (freq.count(mod))
+                  if ((i - freq[mod] >=2))
+                        return true;
+            else
+                  freq[mod] = i;
+      }
+
+      return false;
+
+
+    }
+};
+
+
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& numbers, int target) {
+        
+      //numbers = [2,7,11,15], target = 9
+
+      int size = numbers.size();
+      
+      int i = 0, j = size-1;
+      
+      while (i < j){
+            int sum = numbers[i] +  numbers[j];
+            
+            if (sum == target){
+                  return {i +1, j+1};
+            }
+            else if (sum > target )
+                        j--;
+                  else 
+                        i++;
+      }
+
+      
+      return {};
+
+    }
+    //maxArea
+};
+
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+      
+            int size = height.size();
+            int maxRes = 0 ;
+            int i =0, j= size -1;
+
+            while (i<j){
+
+                  maxRes = max(maxRes,(j-i) * min(height[i],height[j]));
+                  if (height[i] > height[j])
+                        j--;
+                  else 
+                        i++;
+
+            }            
+      return maxRes;
+
+    }
+};
+
+
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) { //3 numbers  sum = 0 
+      
+            int size = nums.size();
+            //sort so we can do 2 sum with 2 pointers 
+            sort(nums.begin(),nums.end());
+
+            vector<vector<int>> result;
+
+            //fix 1 number and  it becomes 2 sum problem. we can since sorted. 
+            for (int i = 0; i < size -2 ; i++  ){
+                  if ( i > 0  &&  nums[i] == nums[i-1] ) //we avoid duplicates to avoid duplicate results. sorted  
+                        continue; //skip we already calculated
+
+                  int j = i+1;
+                  int k = size -1;
+                  
+                  
+                  while (j<k){
+                        
+                        int sum =  nums[j] + nums[k] + nums[i];
+
+                        if (sum == 0  ){
+                              result.push_back({nums[i],nums[j],nums[k]});
+
+                              //skip duplicates
+                              while (j<k && nums[j] == nums[j+1] ) j++;
+                              while (j<k && nums[k] == nums[k-1] ) k--;
+
+                              //next number
+                              j++; 
+                              k--;
+                        }
+                        else if (sum > 0  )
+                                   k--;
+                              else
+                                    j++; 
+                  }
+            }     
+            return result; 
+    }
+};
+
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+     
+      int next = 1;
+      for (int i = 1; i < nums.size(); i++    ){
+            
+            if( nums[i] != nums[i-1] ){
+                  nums[next] = nums[i];
+                  next++;
+            }
+      }
+
+      return next;
+
+
+    }
+};
+
+class Solution {
+public:
+    void moveZeroes(vector<int>& nums) {
+  
+      int zeros = 0;
+      int size = nums.size();
+      
+      int next = 0;
+      
+      for (int i = 0 ; i < size ; i++){
+
+            if (nums[i] == 0){
+                  zeros++;
+            }
+            else{ 
+                  nums[next] = nums[i];
+                  next++;
+            }
+      }
+      for (int i =size - zeros ; i < size; i++    )
+            nums[i] = 0;
+    }
+};
+
+class Solution {
+public:
+    int minSubArrayLen(int target, vector<int>& nums) { //whose sum is greater than or equal to target. I
+      
+      int minLen = numeric_limits<int>::max();
+
+      int size = nums.size();
+      int sum = 0;
+      
+      for (int right = 0, left =0; right < size; right ++ ){
+      
+            sum += nums[right]; //expand first
+
+            while(sum >= target){
+                  minLen = min(minLen,right - left +1);
+                  sum -=nums[left];
+                  left ++;      
+            }
+      }
+      
+      return minLen == numeric_limits<int>::max() ? 0: minLen;  
+
+
+    }
+};
+
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+
+      unordered_set<char> seen;
+      int longest = 0;
+
+      for (int right = 0, left=0 ; right < s.length() ; right++ ){
+
+            while (seen.count(s[right])){
+                  seen.erase(s[left]);
+                  left++;
+            }
+            
+            seen.insert(s[right]);
+
+            longest = max(longest, right-left + 1 ); 
+
+      }
+      return longest;
+    }
+};
+
+class Solution {
+public:
+    bool checkInclusion(string s1, string s2) {
+        
+    }
+};
+
+
+//Input: s = "AABABBA", k = 1
+//Output: 4
+
+class Solution {
+public:
+    int characterReplacement(string s, int k) {
+      
+      array<int,26> freq= {};
+      int result = 0;
+
+      int right =0;
+      int left = 0;
+      int maxFreqChar =0;
+
+      // window size  - maxFreqChar  <= k     - valid  k can replace 
+      while(  right < s.size() ){ //expand window 
+            freq[s[right] - 'A']++;
+            maxFreqChar = max(maxFreqChar,freq[s[right] - 'A'] );
+
+            while (( right - left +1) - maxFreqChar > k ){ //invalid ->  shrink 
+
+                  freq[s[left] - 'A']--;
+                  left++;
+            }
+
+            //update result, current window size
+            result = max(result,right -left +1 );
+            right++;
+            
+      }
+      
+      return result;
+    }
+};
+
+/*
+Input: nums = [1,1,1,0,0,0,1,1,1,1,0], k = 2
+Output: 6
+Explanation: [1,1,1,0,0,1,1,1,1,1,1]
+*/
+class Solution {
+public:
+    int longestOnes(vector<int>& nums, int k) {
+
+      int size = nums.size();
+
+      int longest = 0;
+      int numOfOnes = 0;
+      for (int left = 0, right = 0  ; right < size; ){
+            
+            numOfOnes += nums[right] == 1 ? 1:0;
+            
+            int windowSize = right - left +1;
+            while (windowSize - numOfOnes > k  ){ //invalid condition  
+                  windowSize--;
+                  numOfOnes -= nums[left] == 1 ? 1:0;
+                  left++;
+
+            }
+            longest = max(longest, windowSize);
+            
+            right++;
+      }
+
+      return longest;
+
+    }
+};
+
+/*
+
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+*/
+class Solution {
+public:
+    string minWindow(string s, string t) {
+  
+      int sizeT = t.length();
+
+      unordered_map<char,int> charFreq;
+      for (char ch:t)
+            charFreq[ch]++;
+
+      int minBegin = 0, minEnd = s.length() +1;
+      int totalFound = 0;
+      
+      for (int right = 0,left =0; right < s.length() ; right++ ){
+            
+            charFreq[s[right]]--;
+            if(charFreq[s[right]] >= 0){
+                  
+                  totalFound++;
+            } 
+            
+            while (totalFound == sizeT ){
+
+                 charFreq[s[left]]++;
+                  if (charFreq[s[left]] > 0) {
+                        totalFound--;
+            }
+
+                  if (minEnd - minBegin +1 > right - left +1   ){
+                        minBegin = left; 
+                        minEnd = right;
+                  }
+                   
+                  left++;
+            }
+      }
+      
+      return minEnd - minBegin == s.length() +1 ? "":s.substr(minBegin,minEnd - minBegin +1); 
+    }
+};
+
+
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+      
+      if (!head || !head->next)
+            return nullptr;
+      
+      //unordered_set<ListNode *> seen;
+
+      ListNode * slow = head , * fast = head , * meetingPt =nullptr ;  
+
+      while (fast && fast->next){
+            
+
+            slow = slow->next;
+            fast = fast->next->next;
+
+            if (slow == fast){
+                  meetingPt = slow;
+                  break;
+            }
+      } 
+
+      if (!meetingPt)
+            return nullptr;
+      else{
+            while (head != meetingPt){
+                  head= head->next;
+                  meetingPt = meetingPt->next;
+            }
+
+      }
+
+      return meetingPt;
+    }
+};
+
+// 1-2-2-1
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+         
+      if (!head || !head->next)
+            return true;
+      
+      ListNode* slow = head;
+      ListNode* fast = head;
+
+      while (fast && fast ->next){
+
+            slow = slow->next;
+            fast = fast->next->next;
+      }     
+      
+      /// fast == nullptr even mid e
+      if (fast != nullptr)
+            slow = slow->next;
+
+      ListNode* mid = slow;
+
+      ListNode* prev = nullptr;
+      ListNode* curr = mid;
+      
+      while (curr  ){
+            
+            ListNode* next = curr->next;
+            curr->next = prev;
+
+            prev= curr;
+            curr= next;
+      }
+
+      ListNode * p1 = head;
+      ListNode * p2 = prev;
+
+      while (p2){
+
+            if (p1->val != p2->val)
+                  return false;
+            p1 = p1->next;
+            p2 = p2->next;
+      }
+
+      return true;
+
+
+      
+
+
+      
+
+    }
+};
+
+
+//Input: head = [1,2,3,4,5], n = 2
+//Output: [1,2,3,5]
+
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+     
+            ListNode dummy(0);
+            dummy.next = head;
+
+        ListNode* fast = &dummy;
+        ListNode* slow = &dummy;
+        
+        // give fast n+1 head start
+        for (int i =0; i <= n; i++)
+            fast= fast->next;
+
+      while(fast){
+            fast = fast->next;
+            slow = slow->next;
+      }
+
+      slow->next =slow->next->next; 
+     
+      
+     return dummy.next; 
+
+    }
+};
+
+class Solution {
+public:
+    bool isHappy(int n) {
+        
+      int curr = n;
+      
+      unordered_set<int> seen;
+
+      while (1){
+
+            int sum = 0;
+            
+            while (curr){
+                  int mod = curr % 10;      
+                  sum += pow(mod,2);
+                  curr = curr / 10;
+            }
+            curr = sum;
+            if (sum == 1)     
+                  return true;
+
+            if (seen.count(sum))
+                  return false;
+
+            seen.insert(sum);
+      }
 
 
 
+    }
+};
 
 
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+  
+      if (!head || !head->next )     
+            return head;
+
+      ListNode* prev = nullptr , * curr = head ;
+
+
+      while (curr){
+
+            ListNode* nextNode = curr ->next ;
+            curr->next = prev;
+
+            prev = curr;
+            curr = nextNode;
+
+      }
+
+      return prev;
+
+
+    }
+};
+
+
+//Input: head = [1,2,3,4,5], left = 2, right = 4
+//Output: [1,4,3,2,5]
+
+class Solution {
+public:
+    ListNode* reverseBetween(ListNode* head, int left, int right) {
+  
+      ListNode * prev = nullptr, * curr = head;
+
+      int i = 0;
+      while ( i < left  ){
+            ListNode* nextNode = curr ->next ;
+            prev = curr;
+            curr = nextNode;
+            i++;
+      }
+
+      while ( i < right ){
+      
+      
+      }
+      
+      
+
+      
+      
+
+
+
+    }
 };
