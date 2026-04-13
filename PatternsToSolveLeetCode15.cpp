@@ -1890,27 +1890,1290 @@ class Solution {
 public:
     ListNode* reverseBetween(ListNode* head, int left, int right) {
   
-      ListNode * prev = nullptr, * curr = head;
+      
+      
+      if (!head || !head->next || left == right )
+            return head;
+
+      ListNode dummy(0);
+      ListNode * prev = &dummy;
+
+      dummy.next = head;
+
+
+      // move prev to before left
+      for (int i = 1;  i < left; i ++)
+            prev= prev->next;
+
+      ListNode * curr =  prev->next;//2
+      ListNode * leftTail = prev;
+      
+      ListNode* leftHead =curr ;  
+      
+      
+      prev = nullptr;   
+
+      //reversing
+      for (int i = 0 ; i < right - left +1 ; i++){
+            ListNode* temp = curr -> next ;
+            curr -> next = prev;
+            prev = curr;
+            curr = temp;
+      }
+      
+      leftHead -> next = curr;
+      leftTail ->next = prev; 
+
+      return dummy.next; //might be new head
+
+    }
+};
+
+
+//Input: head = [1,2,3,4,5], k = 3
+//Output: [3,2,1,4,5]
+
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+      ListNode dummy(0);
+
+      dummy.next = head;
+
+      ListNode * curr = head;
+
+      ListNode * tailPrev = &dummy; // tail of the previous sublist  
+      while (curr){
+
+            ListNode * headCurr = curr; // head in the sub list that we reverse
+
+            ListNode * tempCurr = curr; 
+            //check if to reverse
+            for (int i = 0; i < k; i++  ){
+                  if ( !tempCurr ){
+                        return dummy.next;
+                  }
+                  tempCurr = tempCurr->next;
+            }
+            
+            ListNode * prev = nullptr;    
+                    
+
+            for (int i = 0; i < k; i++){
+                  ListNode * temp = curr->next;
+                  curr->next = prev;
+                  prev = curr;
+                  curr = temp;
+            }
+
+            headCurr ->next = curr;
+            tailPrev->next = prev;
+            tailPrev = headCurr;
+      }
+
+        return dummy.next;
+    }
+};
+
+class Solution {
+public:
+    void reorderList(ListNode* head) {
+      
+      if (!head || !head->next)
+            return;
+      
+      stack<ListNode*> st;
+      ListNode* slow = head, * fast = head;
+      ListNode* mid;
+      
+      while (fast->next && fast->next->next){ // find end of first half //works for 
+             
+            fast = fast->next->next;
+            slow = slow->next;
+      }
+
+      ListNode* p2 = slow->next;
+      
+      slow->next = nullptr;
+      
+      //push to stack second list 
+      while (p2  ){ 
+            ListNode* temp = p2->next;
+            p2->next = nullptr;
+            st.push(p2);     
+            p2 = temp;
+      }
+      
+      //weave
+      ListNode* curr = head;
+      while (curr  && !st.empty()){
+            
+            ListNode* temp = curr->next;
+            ListNode* top = st.top();
+            st.pop();
+
+            curr->next =top;
+            top->next = temp;
+            curr = temp;
+      }
+
+    }
+};
+
+//Input: nums1 = [4,1,2], nums2 = [1,3,4,2]     3,4,-1,-1
+//Output: [-1,3,-1]
+class Solution {
+public:
+    vector<int> nextGreaterElement(vector<int>& nums1, vector<int>& nums2) {
+      
+      unordered_map<int,int> map;
+      stack<int> st;
+      vector<int> res(nums1.size());
+
+      for ( int i = 0 ; i < nums2.size(); i++ ){
+            
+            while(!st.empty() && st.top() < nums2[i]  ){ // decreasing stack - remove when greater found 
+                  int top = st.top();
+                  st.pop();
+                  map[top] = nums2[i];
+            }
+            st.push(nums2[i]);
+      }
+      
+      while(!st.empty()){
+              int top = st.top();
+                  st.pop();
+                  map[top] = -1;
+
+      }
+      
+      for (int i =0; i < nums1.size(); i++)
+            res[i] = map[nums1[i]];
+
+        return res;
+    }
+};
+
+//Input: temperatures = [73,74,75,71,69,72,76,73]
+//Output: [1,1,4,2,1,1,0,0]
+class Solution {
+public:
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+      
+      vector<int> res(temperatures.size(),0);
+      stack<int> st;
+
+      for(int i = 0; i < temperatures.size(); i++){
+
+            int currNum = temperatures[i];
+            while (!st.empty() && temperatures[st.top()] < currNum  ){
+                  int top = st.top();
+                  st.pop();
+                  res[top] = i -  top;
+            }
+            st.push(i);
+      }
+
+      return res;
+
+      
+    }
+};
+
+//Input: nums = [1,2,1]
+//Output: [2,-1,2]
+class Solution {
+public:
+    vector<int> nextGreaterElements(vector<int>& nums) {
+        
+      stack<int> st;
+      int size = nums.size();
+
+      vector<int> res (size,-1);
+
+      for (int i = 0; i < size * 2 ; i++  ){
+            
+            while(!st.empty() && nums[i%size] > nums[st.top()]  ){
+                  int top = st.top();
+                  st.pop();
+                  res[top] = nums[i%size];
+            }
+
+            if (i<size)
+                  st.push(i);
+
+      }
+
+      return res;
+    }
+};
+
+
+//Input: heights = [2,1,5,6,2,3]
+//Output: 10
+
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        
+      stack<int> st;
+      int size = heights.size();
+
+      //smallest increasing stack bot min top 
+
+      //virtual boubdry  - index
+      vector<int> nextSmallest(size,size); //means can be extended all the way  to the right  
+      
+      vector<int> prevSmallest(size,-1); // 
+
+      for (int i = 0; i < size; i++ ){
+
+            while ( !st.empty() && heights[st.top()] >= heights[i] ){ //found smaller breaking condition 
+                  int top = st.top();
+                  st.pop();
+                  nextSmallest[top] =  i;
+            }
+            st.push(i);
+      }
+      
+      while (!st.empty())
+            st.pop();
+      
+      
+      for (int i = size -1; i >= 0; i-- ){
+
+            while ( !st.empty() && heights[st.top()] >= heights[i] ){ //found smaller breaking condition 
+                  int top = st.top();
+                  st.pop();
+                  prevSmallest[top] =  i;
+            }
+            st.push(i);
+      }
+      
+      while (!st.empty())
+            st.pop();
+
+      int maxRect = 0;
+
+      for (int i = 0; i < size; i++ ){
+
+            int right =  nextSmallest[i];
+            int left =  prevSmallest[i];
+
+            // for each height we want to see how far can be extended
+            
+            int area = (right -left-1) * heights[i];  // it can extend left until just before the previous smaller bar -1 -1
+            maxRect = max(maxRect,area);  
+      }
+
+      return maxRect;
+
+
+    }
+};
+
+
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        
+      stack<int> st;
+      int n = heights.size();
+      int maxArea = 0;
+
+      for (int i =      0; i<=n ; i++){ //expanding right
+
+            int currHeight = (i == n ) ? 0 : heights[i]; // right boundry
+
+            while (!st.empty() &&  heights[st.top()] >  currHeight){ //expanding left  since we pop left 
+                  int h =  heights[st.top()];
+                  st.pop();
+
+                  int leftBoundary = st.empty() ? -1 : st.top(); //left boundry
+                  int width = i - leftBoundary - 1;  // left is changin with every pop
+
+                  maxArea = max(maxArea , width * h);
+            }
+            st.push(i);
+      }
+
+      return maxArea;
+
+    }
+};
+
+
+//sum of all continiouns subarray ranges = sum of all subarray maximums - sum of all subarray minimums
+//find for every num   
+//Input: nums = [4,-2,-3,4,1]
+//Output: 59
+class Solution {
+public:
+    long long subArrayRanges(vector<int>& nums) {
+        
+
+
+
+
+    }
+};
+
+
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+  
+      priority_queue<int,vector<int> ,greater<int>> minHeap; //min is root so the rest are greater
+
+
+      for (int num:nums){
+            minHeap.push(num);
+
+             if (minHeap.size() > k   ){
+                  minHeap.pop();
+             }
+
+      }
+      return minHeap.top();
+
+      
+    }
+};
+
+
+
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+      
+      vector<int> res;
+      unordered_map<int,int> freq;
+      priority_queue < pair<int,int> , vector< pair<int,int> >, greater<pair<int,int>>> minHeap; 
+
+      for (int num:nums)
+            freq[num]++;
+      
+      for (auto &[num,count]:freq){
+            minHeap.push({count,num});
+
+            if (minHeap.size() > k)
+                  minHeap.pop();
+      }    
+      
+      while (!minHeap.empty())
+      {
+            res.push_back(minHeap.top().second);
+            minHeap.pop();
+      }
+      return res;
+
+    }
+};
+
+//Input: points = [[3,3],[5,-1],[-2,4]], k = 2
+//Output: [[3,3],[-2,4]]
+class Solution {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
+     // minimum -> max heap  default
+
+     priority_queue<pair<int,int>> maxHeap;
+     vector<vector<int>> res;
+
+     int i =0;
+     for (auto point:points){
+            int distance = pow(point[0],2) + pow(point[1],2);
+            maxHeap.push({distance,i});
+
+            if (maxHeap.size() > k)
+                  maxHeap.pop();
+
+            i++;
+     }
+
+     while (!maxHeap.empty())
+     {
+            
+            res.push_back(points[maxHeap.top().second]);
+             maxHeap.pop();
+     }
+     return res;
+
+
+      
+    }
+};
+
+
+//KthLargest kthLargest = new KthLargest(3, [4, 5, 8, 2]);
+//kthLargest.add(3); // return 4
+//kthLargest.add(5); // return 5
+
+class KthLargest {
+public:
+    KthLargest(int k, vector<int>& nums) {
+      //          this->k = k;  
+
+      for (int num:nums){
+            minHeap.push(num);
+            if (minHeap.size() > k)
+                  minHeap.pop();
+            
+      }     
+}
+    
+    int add(int val) {
+         minHeap.push(val);
+            minHeap.pop();
+            minHeap.top();
+    }
+
+private:
+    priority_queue<int,vector<int>,greater<int>> minHeap;
+};
+
+
+//MedianFinder medianFinder = new MedianFinder();
+//medianFinder.addNum(1);    // arr = [1]
+//medianFinder.addNum(2);    // arr = [1, 2]
+//medianFinder.findMedian(); // return 1.5 (i.e., (1 + 2) / 2)
+
+class MedianFinder {
+public:
+    MedianFinder() {
+        
+        nextQueue = true;
+
+    }
+    
+    void addNum(int num) {
+      
+      if (nextQueue ){
+            
+            if (maxHeap.empty())
+                  minHeap.push(num);
+            else{
+            
+
+                  int topLeft = maxHeap.top(); 
+                  if (topLeft >= num ){ //left is greater . we swap.
+                        maxHeap.pop(); 
+                        minHeap.push(topLeft);
+                        maxHeap.push(num);
+                  }
+                  else  
+                        minHeap.push(num);
+                  }
+      }
+      else{
+            int topRight = minHeap.top();
+            if (topRight <= num ){
+                  minHeap.pop();
+                  maxHeap.push(topRight);
+                  minHeap.push(num);
+            }
+            else  
+                  maxHeap.push(num);
+      }
+
+      nextQueue = !nextQueue;
+
+    }
+    
+    double findMedian() {
+        
+      return !nextQueue  ? minHeap.top() : minHeap.top() + (maxHeap.top() - minHeap.top())/2.0 ;
+}
+
+private:
+    
+    priority_queue<int> maxHeap; //left false
+    priority_queue<int,vector<int>,greater<int>> minHeap; //right  true
+    bool nextQueue; 
+};
+
+/**
+ * Your MedianFinder object will be instantiated and called as such:
+ * MedianFinder* obj = new MedianFinder();
+ * obj->addNum(num);
+ * double param_2 = obj->findMedian();
+ */
+
+
+
+ class Solution {
+public:
+
+      struct Compare {
+        bool operator()(ListNode* a, ListNode* b) {
+            return a->val > b->val;
+        }
+    };
+
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+      
+      if (lists.size() == 0)
+            return nullptr;
+
+      priority_queue <ListNode * ,vector<ListNode *>, Compare > minHeap;
+
+      ListNode * head = nullptr;;
+
+      for (ListNode * list:lists)
+            if (list)
+                  minHeap.push(list);
+
+        if (minHeap.empty()) {
+            return nullptr;
+        }
+
+
+      head = minHeap.top();
+      minHeap.pop();
+      
+      if (head->next)
+                  minHeap.push(head->next);
+      
+      ListNode * curr = head;
+
+      while (!minHeap.empty()){
+
+            ListNode * top = minHeap.top(); 
+            minHeap.pop();
+            
+            curr->next = top;
+            curr = curr->next;
+            if (top->next)
+                  minHeap.push(top->next);
+            
+      }
+      curr->next = nullptr;
+      return head;
+    }
+};
+
+//return the kth smallest element in the matrix.
+//Input: matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8
+//Output: 13
+//The elements in the matrix are [1,5,9,10,11,12,13,13,15], and the 8th smallest number is 13
+//you're ordering all numbers from smallest to largest, then taking position k.
+
+//using heap to sort the array 
+
+class Solution {
+public:
+    int kthSmallest(vector<vector<int>>& matrix, int k) {
+      
+      int size = matrix.size();
+
+      priority_queue< pair<int,int>, vector<pair<int,int>> ,greater<pair<int,int>> > minHeap; 
+      //priority_queue<int> maxHeap;  // top is max last
+      
+      //A[i][j] is equivalent to A[i * N + j]
+      //since each row is sorted the min of all this will be the minimum   
+      for (int i = 0; i < size ; i ++  ){
+            minHeap.push({matrix[i][0], i*size }  );
+      }
+
+      //extract k times
+      for (int i = 0; i < k-1 ; i ++  ){
+            
+            auto top = minHeap.top();
+            minHeap.pop();
+
+            int row =  top.second /size;
+            int col = top.second % size; 
+
+            //push next
+            if ( col  + 1 < size)
+                  minHeap.push( {matrix[row][col  + 1] ,row* size + col +1 } );
+            
+      }
+
+      return minHeap.top().first;
+
+    }
+};
+
+
+//Input: k = 2, w = 0, profits = [1,2,3], capital = [0,1,1]
+//Output: 4
+
+class Solution {
+public:
+    int findMaximizedCapital(int k, int w, vector<int>& profits, vector<int>& capital) {
+        
+      int size = profits.size();
+
+      vector<pair<int,int>> pAc;
+
+      priority_queue<int> maxHeap;
+
+      //pair the two
+      for (int i = 0; i < size; i++)
+            pAc.push_back({capital[i],profits[i]});
+
+      sort(pAc.begin(),pAc.end());
+
+      int canWork = 0;
+
+      for (int finishedProject = 0; finishedProject < k; finishedProject++ ){
+
+            while ( canWork < size && pAc[canWork].first <= w  ){
+                  maxHeap.push(pAc[canWork].second);
+                  canWork++;
+            }
+
+            if (maxHeap.empty())
+                  break;
+
+            w+= maxHeap.top();
+            maxHeap.pop();
+      }
+
+      return w;
+
+    }
+};
+
+//Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+//Output: [[1,6],[8,10],[15,18]]
+//Explanation: Since intervals [1,3] and [2,6] overlap, merge them into [1,6].
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+  
+      sort(intervals.begin(),intervals.end());
+
+      int size = intervals.size();
+      vector<vector<int>> res; 
+
+      if (size){
+            res.push_back(intervals[0]);
+      }
+
+      for (int i = 1; i < size; i++){
+
+            if (res.back()[1] < intervals[i][0]  )
+                  res.push_back(intervals[i]);
+            else
+               res.back()[1] = max (intervals[i][1],res.back()[1]);   
+
+      } 
+
+return res;
+
+    }
+};
+
+
+//Input: intervals = [[0,30],[5,10],[15,20]]
+//Output: false
+
+
+class Solution {
+public:
+    bool canAttendMeetings(vector<vector<int>>& intervals) {
+
+      sort(intervals.begin(),intervals.end());
+
+      for (int i = 0; i + 1 < intervals.size() ; i++){
+            auto current = intervals[i];
+            auto next = intervals[i+1];
+            
+            if (current[1] > next[0]   )
+                  return false;
+
+
+      }     
+
+        return true;
+    }
+};
+
+//Input: intervals = [[0,30],[5,10],[15,20]]
+//Output: 2
+
+class Solution {
+public:
+    int minMeetingRooms(vector<vector<int>>& intervals) {
+       
+       sort(intervals.begin(),intervals.end());
+    
+       //How many meetings are still running when this one starts?
+      priority_queue<int, vector<int>, greater<int>> minHeap; 
+
+      int rooms = 0;
+      int size = intervals.size();
+
+      for (int i = 0 ; i < size; i++){
+            // if the current time greater then earliest min - we can grab the room   
+            // we only clear 1 slot since  other  rooms were needed at the time  
+            if (!minHeap.empty() && minHeap.top() <= intervals[i][0]   ) /// intervals[i][0] the current time
+                  minHeap.pop();
+
+            
+            minHeap.push(intervals[i][1]); //room added 
+           
+      }
+      
+      return minHeap.size(); 
+
+    }
+};
+
+//Input: intervals = [[1,2],[2,3],[3,4],[1,3]]
+//Output: 1
+class Solution {
+public:
+    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+      
+      if (intervals.empty())
+            return 0;
+
+      int size = intervals.size();
+      sort(intervals.begin(),intervals.end());
+      int res = 0;
+
+      int prevEnd = intervals[0][1];
+      
+      for (int i = 1; i < size; i++ ){
+            
+            auto & curr = intervals[i]; 
+            
+            if ( curr[0] >= prevEnd) //no overlap 
+                  prevEnd = curr[1];
+            else { // overlap
+                  res++;
+                  prevEnd = min (prevEnd, curr[1]);
+            }
+
+      }
+
+      return res;
+
+    }
+};
+
+
+//Input: points = [[10,16],[2,8],[1,6],[7,12]]
+//Output: 2
+// [1,6][2,8][7,12][10,16]  sorted
+
+class Solution {
+public:
+    int findMinArrowShots(vector<vector<int>>& points) {
+        
+      if (points.empty())
+            return 0;
+
+      sort(points.begin(), points.end());
+      int size = points.size();
+      auto & prevEnd = points[0][1];
+      int arrows =1;
+
+      for (int i =1; i < size; i++){
+            auto & curr =  points[i];
+
+            if (curr[0] <= prevEnd   ) //overlap 
+                  prevEnd = min(prevEnd,curr[1]);
+            else{ //no overlap new arrow
+                  arrows++;
+                  prevEnd = curr[1];
+            }
+      }
+    return arrows;
+    }
+};
+
+
+
+//Input: trips = [[2,1,5],[3,3,7]], capacity = 4
+//Output: false
+
+class Solution {
+public:
+    bool carPooling(vector<vector<int>>& trips, int capacity) {
+
+       sort(trips.begin(), trips.end(),
+             [](const vector<int>& a, const vector<int>& b) {
+                 return a[1] < b[1];   // sort by start
+             });
+
+      priority_queue < pair<int,int> , vector<pair<int,int>> , greater<pair<int,int> > > minHeap;
+      //end - passangers 
+
+      int size = trips.size();
+
+      int prevEnd = trips[0][2];
+      
+      int empty = capacity ; 
+
+      for (int i = 0; i < size; i ++){
+
+            auto & curr = trips[i];
+            
+            while( !minHeap.empty() &&  minHeap.top().first <= curr[1] ){ //clear seats 
+                  empty += minHeap.top().second;
+                   minHeap.pop();
+            }
+            
+            empty -= curr[0];
+
+            if (empty < 0)
+                  return false;
+
+            minHeap.push({curr[2],curr[0]});
+            
+      }
+
+      return true;
+    }
+};
+
+
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        
+      int size = nums.size();
+
+      int l = 0;
+      int r = size -1;
+
+      while (l <= r){
+      
+            int mid = l + (r-l) / 2;
+
+
+            if  ( target  <   nums[mid] )
+                  r = mid - 1;
+            else if   ( target  >   nums[mid] )
+                  l = mid + 1;
+                  else
+                        return mid; 
+
+      }
+      return -1; 
+
+    }
+};
+
+
+
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        
+      int size = nums.size();
+
+      int l = 0;
+      int r = size -1;
+
+      while (l <= r){
+      
+            int mid = l + (r-l) / 2;
+
+
+            if  ( target  <   nums[mid] )
+                  r = mid - 1;
+            else if   ( target  >   nums[mid] )
+                  l = mid + 1;
+                  else
+                        return mid; 
+
+      }
+      return l-1; 
+
+
+    }
+};
+
+
+//Input: nums = [5,7,7,8,8,10], target = 8
+//Output: [3,4]
+//   0 + 5-0 /2
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+     
+      int size = nums.size();      
+      int l = 0;
+      int r = size -1;
+
+      int right = -1;
+      int left = -1;
+      
+
+    while (l <= r){
+      
+            int mid = l + (r-l) / 2;
+
+            if  ( target  ==  nums[mid] ){ //  
+                  right = mid ; //canidate
+                  l = mid + 1; //keep searching right
+            }else 
+                  if  ( target  <   nums[mid] ) 
+                        r = mid - 1;
+                  else 
+                        l = mid + 1;
+            
+      }      
+
+      l = 0;
+      r = size -1;
+
+       while (l <= r){
+      
+            int mid = l + (r-l) / 2;
+
+            if  ( target  ==  nums[mid] ){  
+                  left = mid ; //canidate
+                  r = mid - 1; //keep searching left
+            } else
+                  if  ( target  <   nums[mid] ) 
+                        r = mid - 1;
+                  else 
+                        l = mid + 1;
+      
+      }      
+
+
+      return {left,right};
+
+    }
+};
+
+
+bool isBadVersion(int);
+
+class Solution {
+public:
+    int firstBadVersion(int n) {
+     
+      int l = 1;
+      int r = n;
+
+      int res = 0;
+      while (l <= r){
+
+            int mid = l + (r-l) /2;
+
+            if (isBadVersion(mid)){
+                  res = mid; //candiate
+                  r = mid -1;
+            }
+            else 
+                  l = mid +1;
+
+
+      }
+
+      return res;
+
+
+    }
+};
+
+//Input: nums = [1,2,3,1]
+//Output: 2
+class Solution {
+public:
+    int findPeakElement(vector<int>& nums) {
+  
+      int size = nums.size();
+
+      int l = 0;
+      int r = size - 1;
+
+      // nums[i] vs nums[i+1]  if greater increasing so the peak on the rightr continue.
+      while (l < r){
+            
+            int mid = l + (r - l) /2;
+
+            if (nums[mid] < nums[mid+1]){ // increasing    peak on the right
+                  l = mid + 1;  //mid cannot be peak
+                  
+            }
+            else{ // nums[mid] > nums[mid+1] peak on the left
+                  r = mid ; // decreasing mid could be peak
+            }
+      }
+
+      return l;
+
+    }
+};
+
+//Input: nums = [4,5,6,7,0,1,2], target = 0
+//Output: 4
+
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        
+      int size = nums.size();
+
+      int l = 0;
+      int r = size - 1;
+
+      while (l <= r){
+
+            int mid = l + (r-l) /2;
+
+            if (nums[mid] == target)
+                  return mid;
+
+            if ( nums[l] <= nums[mid]  )// left is sorted we can check if target in range
+
+                  if ( nums[l] <= target &&  target < nums[mid] ) // found in the sorted 
+                        r = mid - 1;
+                  else 
+                        l = mid + 1; // not found smaller vector
+            else
+                   if ( nums[mid] < target &&  target <= nums[r] ) // found in the sorted  right
+                        l = mid + 1;
+                  else 
+                        r = mid - 1; // not found smaller vector
+
+      }
+      return -1 ;
+    }
+};
+
+
+
+//Input: nums = [3,4,5,1,2]
+//Output: 1
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        
+      int size = nums.size();
+
+      int l = 0;
+      int r = size - 1;
+
+      int minVal = nums[0]; //a valid canidate 
+
+      
+      while (l <= r){ // 
+      
+            int mid = l + (r-l) /2;
+
+            if ( nums[l] <= nums[mid]  ){ // left is sorted we can check if target in range
+                  minVal = min( nums[l] , minVal);
+                  l = mid + 1;
+            }
+            else{   // right is sorted 
+                  minVal = min( nums[mid] , minVal);
+                  r  = mid -1;
+            }       
+      }
+
+      return minVal;
+
+    }
+};
+
+//Input: piles = [3,6,7,11], h = 8
+//Output: 4
+
+class Solution {
+public:
+    
+      bool canFinish(vector<int>& piles, int h, int mid){
+
+            //(p + k - 1) / k. 
+            int hours =0;
+            for (int i =0;  i < piles.size() ; i ++){
+                  hours += (piles[i] + mid - 1 )/mid;    
+                  if (hours > h)
+                        return false;
+            }
+            return true;
+      }
+
+      int minEatingSpeed(vector<int>& piles, int h) {
+        
+            int l = 1;
+            
+            int r = piles[0];
+            for (int pile:piles)
+                  r = max(r,pile);
+
+            int res = r;
+
+            while (l <= r){
+                  int mid = l + (r-l )/2;
+
+                  if  (canFinish(piles,h ,mid)){
+                        r = mid - 1;
+                        res = mid;
+                  }
+                  else
+                        l = mid + 1 ;
+            }
+
+            return res;
+
+    }
+};
+
+//A[i][j] is equivalent to A[i * N + j] 
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+      
+      int m = matrix.size();
+      int n = matrix[0].size();
+
+      int l  = 0;
+      int r = n*m -1;
+
+      while (l <= r){
+            int mid = l + (r-l) / 2;
+
+            int midI = mid / n; 
+            int midJ = mid % n;
+
+            if ( matrix[midI][midJ] == target )
+                  return true;
+            else if (matrix[midI][midJ] < target)
+                  l = mid +1;
+            else 
+                  r = mid -1;
+
+      }
+
+      return false;
+    } 
+};
+
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+      
+      int m = matrix.size();
+      int n = matrix[0].size();
 
       int i = 0;
-      while ( i < left  ){
-            ListNode* nextNode = curr ->next ;
-            prev = curr;
-            curr = nextNode;
-            i++;
+      int j = n - 1;
+      
+      while (i < m && j > -1   ){
+
+            if (matrix[i][j] == target)
+                  return true;
+            else if (matrix[i][j] > target)
+                  j--;
+            else
+                  i++;
+      } 
+
+      return false;
+
+    }
+};
+
+/*
+Input: grid = [
+  ["1","1","1","1","0"],
+  ["1","1","0","1","0"],
+  ["1","1","0","0","0"],
+  ["0","0","0","0","0"]
+]
+Output: 1
+*/
+
+class Solution {
+
+private:
+      void dfs(vector<vector<char>>& grid, int i, int j ){
+
+            int m = grid.size();
+            int n = grid[0].size();
+
+            if (i<0 || j <0 || i == m || j ==n  || grid[i][j] == '0' || visited.count(i*n + j) )
+                  return;
+            
+            visited.insert(i*n + j);
+
+            
+            dfs(grid,i,j+1);
+            dfs(grid,i,j-1);
+            dfs(grid,i+1,j);
+            dfs(grid,i-1,j);
+      
+
+
+
       }
 
-      while ( i < right ){
+      unordered_set<int> visited;
+
+public:
+    int numIslands(vector<vector<char>>& grid) {
       
+      if (grid.empty() || grid[0].empty() )
+            return 0;
+
+      int m = grid.size();
+      int n = grid[0].size();
+
+      int count = 0;
+      for (int i = 0 ; i < m; i++)
+            for (int j = 0 ; j < n; j++){
+
+                  if (!visited.count(i*n + j) && grid[i][j] == '1' ){
+                        count++;
+                        dfs(grid,i,j);
+                  }
+            }
+      return count;
+    }
+};
+
+
+class Solution {
+
+private:
+      int dfs(vector<vector<int>>& grid, int i, int j ){
+
+            int m = grid.size();
+            int n = grid[0].size();
+
+            if (i < 0 || j < 0 || i == m || j ==n  || grid[i][j] == 0 )
+                  return;
+            
+            grid[i][j] = 0;
+
+            dfs(grid,i,j+1);
+            dfs(grid,i,j-1);
+            dfs(grid,i+1,j);
+            dfs(grid,i-1,j);
       
       }
-      
-      
-
-      
-      
 
 
+
+public:
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        
+        if (grid.empty() || grid[0].empty() )
+            return 0;
+
+      int m = grid.size();
+      int n = grid[0].size();
+
+      int maxIslands = 0;
+
+       for (int i = 0 ; i < m; i++)
+            for (int j = 0 ; j < n; j++)
+                  maxIslands = max(maxIslands, dfs(grid , i , j));      
+            
+
+
+      return maxIslands;
 
     }
 };
