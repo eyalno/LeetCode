@@ -18,6 +18,7 @@
 #include "lib/Trie.h"
 #include "lib/DisJointSet.h"
 #include "lib/LinkedList.h"
+#include <numeric>
 
 
 
@@ -1231,38 +1232,6 @@ return {};
 
       }
 
-      // 15. DP - Dynamic Programming 
-      
-      //compare the 2 strings from left to right 
-      // if s1[i] == s2[i]
-            // dp[i][j] = 1 + dp[i+1][j+1]; // +1 and calculate the next charcter DP 
-      //else //case when  not equal excluding each character 
-            //dp[i][j] = max(dp[i][j+1] , dp[i+1][j]) // exculding 1 from each string
-
-      //dp[i][j]. matrix representation dp[len] base 
-      //base cases:
-            //base cases are needed for starting point for the formuala
-            // when i / j = length(s1/s2) empty strings 
-            //dp[len(s1)][j] 0 for all j in the matrix
-            //dp[len(i)][s2] 0 for all i in the matrix
-            //we populate the dp matrix from smallest subproblem  dp[len(s1)-1][len(s2)-1]  
-      int longestCommonSubsequence(string text1, string text2) {
-      
-            int size1 = text1.size();
-            int size2 = text2.size();
-
-            vector<vector<int>> lcs(size1+1,vector<int>(size2+1,0));
-
-            for (int i = size1-1; i >=0; i--)
-                  for (int j = size2-1; j >=0;  j--){
-                        if (text1[i] == text2[j])
-                              lcs[i][j] = 1 + lcs[i+1][j+1];
-                        else  
-                              lcs[i][j] = max(lcs[i][j+1] , lcs[i+1][j]);
-                  }
-
-            return lcs[0][0];
-      }
 
       int lcsRec(string & text1, string & text2,int i , int j,vector<vector<int>> & dp) {
             
@@ -3143,19 +3112,17 @@ private:
             int n = grid[0].size();
 
             if (i < 0 || j < 0 || i == m || j ==n  || grid[i][j] == 0 )
-                  return;
+                  return 0;
             
             grid[i][j] = 0;
 
-            dfs(grid,i,j+1);
-            dfs(grid,i,j-1);
-            dfs(grid,i+1,j);
-            dfs(grid,i-1,j);
+            int right =  dfs(grid,i,j+1);
+            int left = dfs(grid,i,j-1);
+            int down = dfs(grid,i+1,j);
+            int up = dfs(grid,i-1,j);
       
+            return 1 + right + left + up + down;  
       }
-
-
-
 public:
     int maxAreaOfIsland(vector<vector<int>>& grid) {
         
@@ -3171,9 +3138,1739 @@ public:
             for (int j = 0 ; j < n; j++)
                   maxIslands = max(maxIslands, dfs(grid , i , j));      
             
-
-
       return maxIslands;
+    }
+};
 
+
+//Input: numCourses = 2, prerequisites = [[1,0]]
+//Output: true
+
+class Solution {
+
+private:
+      bool canFinishDFS(int course, vector<int> & state , vector<vector<int>>& graph) {
+
+            if (state[course] == 1)
+                  return false; //cycle found
+
+            if (state[course] == 2)
+                  return true; //already checked
+
+            state[course] = 1;
+            for (int next:graph[course]){
+                 if (!canFinishDFS(next,state,graph))
+                        return false;
+            }
+
+            state[course] = 2; //completed 
+
+            return true;
+      }
+
+
+public:
+    
+      bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+            
+            if (prerequisites.empty())
+                  return true;
+
+            //build a graph  that represents each course and the courses it points to      
+            vector<vector<int>> graph(numCourses); 
+
+            for (auto & prerequisite: prerequisites){
+                  graph[prerequisite[1]].push_back(prerequisite[0]); 
+            }
+
+            vector<int> state(numCourses,0);  // state per course to detect cycle 
+            //0 not visited
+            //1 visiting
+            //2 visited
+            
+            //traverse on each course and see if cycle detected.
+            for (int i = 0; i < numCourses; i++ ){
+                  if (!canFinishDFS(i,state,graph))
+                        return false;
+            }
+            return true;
+    }
+};
+
+
+//Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+//Output: true
+class Solution {
+private:
+
+      bool existDFS(vector<vector<char>>& board, string & word,vector<vector<int>> & visited, int i , int j , int loc  ) {
+      
+            int m = board.size();
+            int n = board[0].size();
+
+            int  wordLength = word.length();
+
+            if (wordLength == loc)
+                  return true;
+           
+             if (i < 0 || j < 0 || i == m || j == n  || visited[i][j] == 1 || board[i][j] != word[loc]   )
+                  return false;   
+
+            visited[i][j] = 1;
+
+            bool bFound =
+            existDFS(board , word , visited, i , j + 1 ,loc + 1  ) ||
+            existDFS(board , word , visited, i , j - 1 ,loc + 1  ) ||
+            existDFS(board , word , visited, i + 1 , j ,loc + 1  ) || 
+            existDFS(board , word , visited, i - 1 , j ,loc + 1  )
+            ;
+            
+            visited[i][j] = 0;
+            return bFound;
+      }
+
+      public:
+  
+      bool exist(vector<vector<char>>& board, string word) {
+        
+            int m = board.size();
+            int n = board[0].size();
+
+            vector<vector<int>> visited(m,vector<int>(n,0));
+            
+            for (int i = 0; i < m; i++)
+                  for (int j = 0; j < n; j++)
+
+                        if (existDFS(board , word , visited, i, j ,0))
+                              return true;
+
+
+            return false;
+    }
+};
+
+
+
+/*
+Input: matrix = [[9,9,4],[6,6,8],[2,1,1]]
+Output: 4
+Explanation: The longest increasing path is [1, 2, 6, 9].
+*/
+
+class Solution {
+private:
+
+      int longestIncreasingPathDFS(vector<vector<int>>& matrix, vector<vector<int>> & memo,int i, int j, int prev ) {
+
+            int m = matrix.size();
+            int n = matrix[0].size();
+            
+            if (i < 0 || i == m || j < 0 || j == n      )   
+                  return 0; 
+            
+            int curr = matrix[i][j]; 
+
+            if (prev >= curr)
+                  return 0;
+
+            if (memo[i][j])
+                  return memo[i][j];
+              
+            int down   = longestIncreasingPathDFS(matrix,memo,i+1,j,  curr);
+            int up     = longestIncreasingPathDFS(matrix,memo,i-1,j,  curr);
+            int right  = longestIncreasingPathDFS(matrix,memo,i,j+1,  curr);
+            int left   = longestIncreasingPathDFS(matrix,memo,i,j-1,  curr);
+
+            memo[i][j] = 1 + max({down,up,left,right}) ;
+
+            return memo[i][j];
+      }
+
+
+public:
+
+      int longestIncreasingPath(vector<vector<int>>& matrix) {
+            
+            int m = matrix.size();
+            int n = matrix[0].size();
+
+            int longest = 0;
+            vector<vector<int>> memo(m,vector<int>(n,0));
+
+            for (int i = 0; i < m; i++)
+                  for (int j = 0; j < n; j++)
+                       longest = max(longest,  longestIncreasingPathDFS(matrix,memo,i,j,-1));
+
+            
+            return longest;
+    }
+};
+
+//Input: grid = [[2,1,1],[1,1,0],[0,1,1]]
+//Output: 4
+/*
+      0 representing an empty cell,
+      1 representing a fresh orange, 
+      2 representing a rotten orange.
+
+
+*/
+class Solution {
+
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+
+      int m = grid.size();
+      int n = grid[0].size();
+
+      queue<pair<int,int>> queue;
+
+      int freshTotal = 0;
+      for (int i = 0; i < m ; i++ )
+            for (int j = 0; j < n ; j++ ){
+                  if (grid[i][j] == 2 )
+                        queue.push({i,j} );
+                  if (grid[i][j] == 1 )
+                        freshTotal++;
+            }
+      
+       if (freshTotal == 0)
+            return 0;
+      
+      int minutes = 0;
+      
+
+      vector<pair<int,int>> dirs ={{-1,0}, {1,0}, {0,1}, {0,-1}, };
+
+      while (!queue.empty() &&  freshTotal > 0){
+
+            int size = queue.size(); 
+           minutes++;
+
+            for (int k = 0;   k < size; k ++){
+                  
+                  auto[i,j]  = queue.front();
+                  queue.pop();
+                  
+                 for (auto [di,dj]:dirs){
+                        int ni = i + di;
+                        int nj = j + dj;
+
+                        if (ni < 0 || ni == m || nj <0 || nj == n  || grid[ni][nj] != 1  )
+                              continue;
+                        
+                        grid[ni][nj] = 2;
+                        freshTotal--;
+                        queue.push({ni,nj} );
+                 }
+            }
+      }
+      
+      return (freshTotal == 0 ? minutes: -1 );
+
+    }
+};
+
+//Input: deadends = ["0201","0101","0102","1212","2002"], target = "0202"
+//Output: 6
+
+class Solution {
+public:
+    int openLock(vector<string>& deadends, string target) {
+     
+      unordered_set<string> dead(deadends.begin(),deadends.end()); 
+      
+      unordered_set<string> visited;
+
+      queue<string> q;
+      
+      q.push("0000");
+      visited.insert("0000");
+
+      if (dead.count("0000"))
+            return -1;
+
+      int turns = 0;
+
+      while (!q.empty()){
+
+            int size = q.size();
+            for (int i = 0; i < size; i++){
+                  string front = q.front();
+                  q.pop();
+                  visited.insert(front);
+                   
+                  if (target == front  )
+                        return turns;
+
+                  for (int j = 0; j< 4; j++){
+                        string up(front);
+                        string down(front);
+
+                        up[j] = (up[j] == '9') ? '0': up[j] + 1; 
+                        down[j] = (down[j] == '0') ? '9': down[j] - 1; 
+
+                        if (!dead.count(up) && !visited.count(up)  ){
+                              q.push(up);
+                              visited.insert(up);
+                        }
+                        if (!dead.count(down) && !visited.count(down)  ){
+                              q.push(down);
+                              visited.insert(down);
+                        }
+                  }
+            }
+            turns++;
+      }
+      
+
+      return -1;
+
+
+    }
+};
+
+/*
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+Output: 5
+*/
+
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        
+      unordered_set<string> wordSet(wordList.begin(),wordList.end());
+      unordered_set<string> visited;
+
+      if (beginWord == endWord)
+            return 1;
+
+      if (!wordSet.count(endWord))
+            return 0;
+
+      queue<string> q;
+
+      q.push(beginWord);
+       visited.insert(beginWord);
+      
+      int length = 1 ;
+      
+      while (!q.empty()){
+
+            int size = q.size();
+
+            for (int i = 0; i < size; i++){
+
+                  string front = q.front();
+                  q.pop();
+                 
+
+                  for (int j = 0; j < front.length(); j++){
+                         
+                        char orginal =front[j];
+                        for (char c = 'a'; c <= 'z'; c++ ){
+                              
+                              front[j] = c ; 
+                              if (visited.count(front))
+                                    continue;
+                              
+                              if (front == endWord )
+                                    return length + 1 ;
+                              
+                              if (wordSet.count(front) ){
+                                    q.push(front);
+                                    visited.insert(front);
+                              }     
+                              
+                              
+                        }
+                        front[j] = orginal;
+                  }
+            }
+            length++; 
+      }
+      return 0;
+    }
+};
+
+
+
+
+
+//Input: nums = [1,2,3]
+//Output: [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+
+
+class Solution {
+
+private:
+      void subsetsDFS(const vector<int>& nums, vector<vector<int>> & res ,vector<int> & curr  ,int i){
+
+            if (nums.size() == i){
+                  res.push_back(curr);
+                  return;
+            }
+
+            //exclude
+            subsetsDFS(nums,res,curr,i+1);
+
+            //include
+            curr.push_back(nums[i]);
+
+            subsetsDFS(nums,res,curr,i+1);
+
+            curr.pop_back(); //backtrack
+      }
+
+//Input: nums = [1,2,3]
+//Output: [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+
+void backtrack(const vector<int>& nums, vector<vector<int>> & res ,vector<int> & curr  ,int start){
+      res.push_back(curr); //Every curr is already a valid subset
+
+      //in each iteration we include and exclude the number
+      for(int i = start; i < nums.size(); i++){ //“Try adding each possible next element”
+            
+            curr.push_back(nums[i]); //include
+            backtrack(nums,res,curr,i + 1); // start i + 1 we pick an item and move forward . every call we push and add other options 
+            curr.pop_back(); //exclude 
+      }
+}
+      
+public:
+    vector<vector<int>> subsets(vector<int>& nums) {
+        
+      vector<vector<int>> res;
+      vector<int>  curr;
+      backtrack(nums,res,curr,0);
+
+      return res;
+    }
+};
+
+
+/*Input: nums = [1,2,3]
+Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]*/
+class Solution {
+
+private:
+      void permuteDFS(vector<int>& nums,  vector<int> & path ,vector<int> & visited , vector<vector<int>> &res ){
+
+            if ( path.size() == nums.size() ){
+                  res.push_back(path);
+                  return;
+            }
+
+            for (int i = 0 ; i < nums.size() ; i++ ){
+
+                  if (visited[i])
+                        continue;
+                  
+                  visited[i] = 1 ;
+                  path.push_back(nums[i]);
+                  permuteDFS(nums, path, visited, res);/// is not needed . no limitations 
+                  visited[i] = 0 ;
+                  path.pop_back();
+            }
+
+      }
+
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+      
+      vector<vector<int>> res;
+      vector<int> path;
+      vector<int> visited(nums.size(),0);
+      permuteDFS(nums, path, visited, res);
+      return res;
+
+    }
+};
+
+
+//Input: candidates = [2,3,5], target = 8
+//Output: [[2,2,2,2],[2,3,3],[3,5]]
+
+class Solution {
+
+private:
+      void combinationSumDFS(vector<int>& candidates,  vector<int> & path,int start  , vector<vector<int>> &res,  int target){
+
+            if ( target == 0){
+                  res.push_back(path);
+                  return;
+            }
+            else if (  target < 0)
+                  return;
+
+            for (int i = start; i < candidates.size(); i ++){
+
+                  path.push_back(candidates[i]);
+                  combinationSumDFS(candidates, path, i,   res , target - candidates[i]); // i i can repeatr the same item but not used i 
+                  path.pop_back();
+            }
+      }
+
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        
+      vector<vector<int>> res;
+      vector<int> path;
+      
+      combinationSumDFS(candidates, path,0,  res , target);
+      return res;
+
+    }
+};
+
+
+
+//Input: n = 3
+//Output: ["((()))","(()())","(())()","()(())","()()()"]
+
+// open < n
+// open < close 
+
+class Solution {
+private:
+       void generateParenthesisDFS(int n,int open , int close, vector<string> & res,string & path ) {
+
+            if (path.size() == 2*n ){
+                  res.push_back(path);
+                  return;
+            }
+
+            if (open < n){
+                  
+                  path.push_back('(');
+                  generateParenthesisDFS(n,open + 1,close,res,path);
+                  path.pop_back();
+            }
+
+            if (close < open  ){
+                  
+                  path.push_back(')');
+                  generateParenthesisDFS(n,open ,close + 1,res,path);
+                  path.pop_back();
+            }
+       }
+public:
+    vector<string> generateParenthesis(int n) {
+      
+      vector<string> res;
+      string path;
+
+      generateParenthesisDFS(n,0,0,res,path);
+
+      return res;
+    }
+};
+
+//Input: s = "aab"
+//Output: [["a","a","b"],["aa","b"]]
+//where to cut string 
+class Solution {
+
+      bool isPalindrome(string & s, int l, int r){
+
+            while (l < r)
+                  if (s[l++] != s[r--])
+                        return false;
+            
+            return true;
+      } 
+      
+      //palindrome not palindrome -> partitioning
+      void partitionDFS(string &s, int start,vector<string>  & path,vector<vector<string>> & res   ) {
+        
+            if ( s.length() == start ){
+                  res.push_back(path);
+                  return;
+            }
+            
+            for (int end = start ; end < s.length(); end++){
+                  if (isPalindrome(s , start , end ) ){ // if found it's a cut off check rest 
+                        path.push_back(s.substr(start, end - start + 1) ); 
+                        partitionDFS(s,end+1,path,res);
+                        path.pop_back();
+                  }
+            }
+      }
+
+public:
+    vector<vector<string>> partition(string s) {
+        
+      vector<vector<string>> res;
+
+      if ( s.empty() )
+            return res;
+
+      vector<string> path;
+
+      partitionDFS(s,0,path,res);
+
+      return res;
+
+
+    }
+};
+
+
+/*
+
+place queen
+mark column and diagonals
+dfs(row + 1)
+unmark column and diagonals
+remove queen
+
+
+Input: n = 4
+Output: [[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]
+Explanation: There exist two distinct solutions to the 4-queens puzzle as shown above
+*/
+
+
+class Solution {
+
+private:
+
+      void solveNQueensBT(int n ,int row , unordered_set<int> &  downDiagonal, unordered_set<int> & upDiagonal, unordered_set<int> & cols, 
+             vector<string> & board, vector<vector<string>> & res  ){
+
+            if ( row == n){
+                  res.push_back(board);
+                  return;
+            }
+            
+            for (int col = 0;  col < n ; col++){
+
+                  //check validity
+                  if (downDiagonal.count(row + col) || upDiagonal.count(row - col) || cols.count(col) )
+                        continue; 
+                  
+                  downDiagonal.insert(row + col);
+                  upDiagonal.insert(row - col);
+                  cols.insert(col);
+
+                  board[row][col] = 'Q';
+                  
+                  solveNQueensBT(n, row + 1 , downDiagonal ,upDiagonal, cols, board ,res  );
+                  
+                  downDiagonal.erase(row + col);
+                  upDiagonal.erase(row - col);
+                  cols.erase(col);
+
+                  board[row][col] = '.';   
+            }
+
+      }
+
+public:
+    vector<vector<string>> solveNQueens(int n) {
+  
+      vector<vector<string>> res;
+      vector<string> board(n, string(n,'.') );
+
+      unordered_set<int>  downDiagonal; //row + col
+      unordered_set<int>  upDiagonal;   //row - col
+      unordered_set<int>  cols;
+
+      solveNQueensBT(n, 0, downDiagonal ,upDiagonal, cols, board ,res  );
+      
+      return res;
+      
+    }
+};
+
+
+class Solution {
+
+private: 
+      vector<string> keyPad = {"",
+                               "",
+                              "abc", // 2
+                              "def", // 3
+                              "ghi",
+                              "jkl",
+                              "mno",
+                              "pqrs",
+                              "tuv",
+                              "wxyz"
+                        };
+
+/*
+Input: digits = "23"
+Output: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
+
+*/
+      void letterCombinationsBT(string & digits, int length, int pos,  string  & path ,vector<string> & result   ) {
+
+            if ( path.length() == length ){
+
+                  result.push_back(path);
+                  return;
+            }
+            char digit = digits[pos];
+
+            string keys = keyPad[digit - '0'];
+
+            for (char key :keys){
+
+                   path.push_back(key);
+
+                  letterCombinationsBT( digits ,length, pos + 1 ,path, result );
+
+                  path.pop_back();             
+            }
+      }
+
+public:
+    vector<string> letterCombinations(string digits) {
+  
+      vector<string> result; 
+      string path;
+
+      letterCombinationsBT( digits ,digits.length(), 0,path, result );
+
+      return result;
+    }
+};
+
+
+
+//Input: root = [1,null,2,3]
+
+//Output: [1,3,2]
+
+
+class Solution {
+
+  struct TreeNode {
+      int val;
+      TreeNode *left;
+      TreeNode *right;
+      TreeNode() : val(0), left(nullptr), right(nullptr) {}
+      TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+  };
+ 
+
+
+void inorderTraversalRec(TreeNode* node, vector<int> & res) {
+
+      if (!node)
+            return;
+
+      inorderTraversalRec(node->left,res);
+      res.push_back(node->val);
+      inorderTraversalRec(node->right,res);
+
+}
+
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+
+      
+      if (!root)
+            return {};
+
+      vector<int> res;
+
+      inorderTraversalRec(root,res);
+
+
+      return res;
+    }
+};
+
+
+class Solution {
+
+ struct TreeNode {
+      int val;
+      TreeNode *left;
+      TreeNode *right;
+      TreeNode() : val(0), left(nullptr), right(nullptr) {}
+      TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+  };
+
+  int dfs(TreeNode* node ){ 
+
+     if (!node) 
+            return 0;
+
+      int leftDepth = dfs(node ->left );
+      
+      int rightDepth =  dfs(node ->right );
+
+      return max (leftDepth,rightDepth) + 1 ; 
+
+  }
+  //Input: root = [3,9,20,null,null,15,7]
+//Output: 3
+public:
+      
+      int maxDepth(TreeNode* root) {
+        if (!root)
+            return 0;
+
+           return dfs(root);
+      
+       }
+};
+
+
+
+
+class Solution {
+
+
+ struct TreeNode {
+      int val;
+      TreeNode *left;
+      TreeNode *right;
+      TreeNode() : val(0), left(nullptr), right(nullptr) {}
+      TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+  };
+
+  int dfs(TreeNode* node ){ 
+
+     if (!node) 
+            return 0;
+
+      int leftDepth = dfs(node ->left );
+      
+      int rightDepth =  dfs(node ->right );
+
+      return max (leftDepth,rightDepth) + 1 ;  //combine
+
+  }
+ 
+
+
+      void traverse(TreeNode* node ){
+            
+            if (!node)
+                  return;
+
+            maxDiameter = max(maxDiameter,  dfs(node->left) +  dfs(node->right));
+            
+            traverse(node->left);
+            traverse(node->right);
+      }
+
+
+      int maxDiameter = 0;
+
+       /*Input: root = [1,2,3,4,5]
+Output: 3 - edges 
+Explanation: 3 is the length of the path [4,2,1,3] or [5,2,1,3].
+
+*/
+    int diameterOfBinaryTree(TreeNode* root) {
+          
+      if (!root || (!root->left && !root->right) ) 
+            return 0;
+
+      
+      traverse(root);
+
+      return  maxDiameter;
+     
+    }
+
+};
+
+
+class Solution {
+
+
+ struct TreeNode {
+      int val;
+      TreeNode *left;
+      TreeNode *right;
+      TreeNode() : val(0), left(nullptr), right(nullptr) {}
+      TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+  };
+
+/*
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22
+Output: [[5,4,11,2],[5,8,4,5]]
+*/
+
+void pathSumDfs(TreeNode* node, int targetSum ,vector<vector<int>> & res , vector<int> & curr ) {
+      
+       curr.push_back(node->val);   
+
+      if (!node->left &&  !node->right && targetSum == node->val)
+             res.push_back(curr);
+
+      if (node->left)
+            pathSumDfs(node->left,  targetSum - node->val , res, curr);    
+      
+      if (node->right) 
+            pathSumDfs(node->right,  targetSum - node->val , res, curr);
+           
+       curr.pop_back();
+}
+
+public:
+
+      vector<vector<int>> pathSum(TreeNode* root, int targetSum) {
+        
+            if (!root)
+                  return {};
+            
+            vector<vector<int>> res;
+            vector<int> curr;
+            pathSumDfs(root,  targetSum , res, curr);    
+            
+
+
+            return res;
+
+    }
+
+
+    /*Input: root = [3,9,20,null,null,15,7]
+      Output: [[3],[9,20],[15,7]]
+
+    */
+     vector<vector<int>> levelOrder(TreeNode* root) {
+      
+      if (!root)
+            return {};
+
+      queue<TreeNode*> q;
+
+      vector<vector<int>> res;
+
+      vector<int> level;
+
+      q.push(root);
+
+      while (!q.empty()){
+
+            int size = q.size();
+            
+            vector<int> level;
+
+            for (int i = 0; i < size ; i++){
+
+                  auto front = q.front();
+                  q.pop();
+
+                  if (front->left)
+                        q.push(front->left);
+                  
+                  if (front->right)
+                        q.push(front->right);
+
+                  level.push_back(front->val);
+
+            }
+            res.push_back(level);
+      }
+      
+      return res;
+    }
+
+/*
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+Output: 3
+Explanation: The LCA of nodes 5 and 1 is 3.
+*/
+
+/*
+      nullptr → if neither p nor q found in this subtree
+	p or q → if one of them is found
+	LCA → if already determined below
+      */
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        longestCommonSubsequence
+      if (root == p || root == q || root == nullptr  )
+            return root;
+
+      TreeNode* left  = lowestCommonAncestor( root->left , p , q);
+      TreeNode* right = lowestCommonAncestor( root->right , p , q);
+      
+      //if p - are in the left right node it is the split point.
+      if (left && right  )
+            return root;
+
+      return left ? left: right ; // if one of them is LCA it will overwrite the child
+    }
+};
+
+
+
+/*
+Input: n = 2
+Output: 2
+Explanation: There are two ways to climb to the top.
+1. 1 step + 1 step
+2. 2 steps
+ 
+base 
+
+*/
+
+
+ // n[i]  = n [i -1] + n[n-2]
+
+class Solution {
+
+private:
+      vector<int> dp{vector<int>(46, 0)};
+
+public:
+    int climbStairs(int n) {
+ 
+      if (n<=2)
+            return n;
+
+      if (dp[n] != 0)
+            return dp[n];
+      
+      dp[n] = climbStairs(n-1)  + climbStairs(n-2);
+      
+      return dp[n];
+
+    }
+};
+
+
+/*
+dp[i] = maximum money you can rob up to house i
+
+a
+1. Rob this house
+
+2. Skip this house
+
+dp[i] = dp[i-2] + nums[i].  - ski
+or 
+dp[i] = dp[i-1] we skip nums[i]
+Max between the two 
+
+Input: nums = [2,7,9,3,1]
+Output: 12
+Explanation: Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (money = 1).
+Total amount you can rob = 2 + 9 + 1 = 12.
+ 
+base case 
+   dp[0]  = nums[0] 
+
+   dp [1] = max (dp[0] , nums[1])
+*/
+
+class Solution {
+
+      int rec(vector<int>& nums ,int n,vector<int> & dp  ) {
+            
+             if (dp[n] != -1 )
+                  return dp[n];
+
+            dp[n] = max (rec(nums,n-2,dp ) + nums[n], rec(nums,n-1,dp ));
+      
+            return dp[n]; 
+      }
+
+      int iterative(vector<int>& nums){
+
+            int size =  nums.size();
+
+            if (size == 1)
+                  return nums[0];
+
+            vector<int> dp(size,-1);
+            dp[0] = nums[0];
+            dp[1] = max(nums[0],nums[1]) ;
+            
+            for (int i = 2; i < size; i ++){
+                  dp[i] = max(dp[i-2] + nums[i] , dp[i-1]  );
+            }
+
+            return dp[size-1];
+      }
+
+public:
+    int rob(vector<int>& nums) {
+  
+      if (nums.size() == 1) // check all base conditions 
+            return nums[0];
+
+      vector<int> dp(nums.size() +1 ,-1); 
+      dp[0] =  nums[0];    
+      dp[1] =  max(nums[0],nums[1]);
+
+      return rec(nums,nums.size() -1,dp );
+    }
+};
+
+
+      // 15. DP - Dynamic Programming 
+      
+      //compare the 2 strings from left to right 
+      // if s1[i] == s2[i]
+            // dp[i][j] = 1 + dp[i+1][j+1]; // +1 and calculate the next charcter DP 
+      //else //case when  not equal excluding each character 
+            //dp[i][j] = max(dp[i][j+1] , dp[i+1][j]) // exculding 1 from each string
+
+      //dp[i][j]. matrix representation dp[len] base 
+      //base cases:
+            //base cases are needed for starting point for the formuala
+            // when i / j = length(s1/s2) empty strings 
+            //dp[len(s1)][j] 0 for all j in the matrix
+            //dp[len(i)][s2] 0 for all i in the matrix
+            //we populate the dp matrix from smallest subproblem  dp[len(s1)-1][len(s2)-1]  
+      int longestCommonSubsequence(string text1, string text2) {
+      
+            int size1 = text1.size();
+            int size2 = text2.size();
+
+            vector<vector<int>> lcs(size1+1,vector<int>(size2+1,0));
+
+            for (int i = size1-1; i >=0; i--)
+                  for (int j = size2-1; j >=0;  j--){
+                        if (text1[i] == text2[j])
+                              lcs[i][j] = 1 + lcs[i+1][j+1];
+                        else  
+                              lcs[i][j] = max(lcs[i][j+1] , lcs[i+1][j]);
+                  }
+
+            return lcs[0][0];
+      }
+
+
+/*
+      Do I continue the previous subarray, or start fresh here?
+      dp[i] = maximum subarray sum ending at index i
+      dp[i] = max(nums[i], dp[i-1] + nums[i]);
+
+      Input: nums = [-2,1,-3,4,-1,2,1,-5,4]
+      Output: 6
+      Explanation: The subarray [4,-1,2,1] has the largest sum 6.
+*/
+class Solution {
+
+      int preFix(vector<int>& nums) {
+            
+            int size = nums.size();
+            
+            int res = numeric_limits<int>::min();
+            
+            vector<int> prefixSum(size + 1,0);
+
+            for (int i = 1 ; i <= size; i++){
+
+                  prefixSum[i] = prefixSum[i-1] + nums[i-1];
+            }
+
+            int minPrefix = 0;
+
+            for (int i = 1 ; i <= size; i++){
+                  res = max(res, prefixSum[i] - minPrefix  );
+                  minPrefix = std::min(minPrefix,prefixSum[i]);            
+            }
+
+            return res;
+      }
+
+
+public:
+    int maxSubArray(vector<int>& nums) {
+        
+      int curr = nums[0];
+      int best = nums[0];
+
+      for (int i= 1; i < nums.size(); i++){
+            curr = max(nums[i], curr + nums[i] );
+            best = max(best,curr);
+      }
+
+      return best;
+
+    }
+};
+
+/*
+Input: nums = [1,5,11,5]
+Output: true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
+*/
+
+class Solution {
+
+
+//Input:  W = 4, val[] = [1, 2, 3], wt[] = [4, 5, 1]
+//Output: 3
+
+vector<vector<int>> memo;
+
+//genrate all subsets to see which is fit  
+int knapsackRec(int W, vector<int> & val, vector<int> & wt,int n) {
+
+      if (W <= 0 || n ==0) //no number left or capicity
+            return 0;
+
+      if (memo[n][W] !=-1 )
+            return memo[n][W];
+
+      //pick 
+      int pick = 0;
+      if (W >= wt[n-1]   )
+            pick = knapsackRec ( W-wt[n-1],val , wt, n-1  ) + val[n-1] ;
+      
+
+      //skip 
+      int skip = knapsackRec ( W , val , wt, n-1  )  ;
+      
+      return  memo[n][W] = max(pick, skip ); 
+
+}
+
+
+/*
+      dp[i][w] Using the first i items, what is the maximum value I can get with capacity w?
+            So we are solving all subproblems:
+      For each item i, for each capacity w, we ask:
+            Do I take this item or not?
+      
+       Don’t take item i      
+            dp[i - 1][w] w ?
+
+       Take item i (if it fits)
+            value + dp[i - 1][w - weight]
+
+
+
+      //Input:  W = 4, val[] = [1, 2, 3], wt[] = [4, 5, 1]
+      //Output: 3
+
+*/
+
+int knapsackItr(int W, vector<int> &val, vector<int> &wt) {
+
+      
+}
+
+// Returns the maximum value that
+// can be put in a knapsack of capacity W
+int knapsack(int W, vector<int> &val, vector<int> &wt) {
+    int n = val.size();
+    return knapsackRec(W, val, wt, n);
+}
+
+
+
+/*
+Input: nums = [1,5,11,5]
+Output: true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
+
+Can I find a subset whose sum is target / 2?
+
+
+*/
+
+/* creating all sub sets no duplicates  */
+bool canPartitionBT(vector<int>& nums, int index, int target ) {
+
+      if (target == 0)
+            return true;
+
+      if (index  == nums.size() || target < 0  )
+            return false;
+
+      bool pick = canPartitionBT(nums, index +1, target - nums[index]);
+      if (pick) return true;
+
+      bool noPick = canPartitionBT (nums, index +1, target ) ;
+
+      return pick || noPick;
+}
+
+
+      //Input: nums = [1,5,11,5]
+    bool canPartitionKnapSack(vector<int>& nums) {
+
+        int target = 0 ;
+      for (int num:nums)
+            target += num;
+
+      // If total sum is odd, it cannot be split into two equal subsets.      
+      if (target % 2 )
+            return false;
+
+      target /= 2;
+      
+      // dp[s] = true if we can form sum s using some of the processed numbers.
+      vector<bool> dp(target + 1,false); // we want to access target pos /sum
+            
+      // Sum 0 is always possible: pick no numbers.
+      dp[0] = true; 
+
+/*.   
+      This is 0/1 knapsack without values  - one dimension.
+
+        Goal:
+
+        Can we form a subset whose sum is target?
+
+        For each num, we update possible sums:
+
+           dp[s] = dp[s] || dp[s - num]   
+             
+        Meaning:
+
+        - dp[s] was already possible before, OR
+
+        - if dp[s - num] was possible before, then adding num makes s possible. -> set true to sum 
+
+        We iterate backwards so each num is used at most once.
+
+        If we iterated forward, the same num could be reused in the same round.
+
+        dp[s] = can we make sum s using some numbers?
+             Think of dp as a set of reachable sums
+             which we build by number 1 by 1.  order doesn;t matter.
+             I’m processing numbers one by one, and each number gives me new sums I can form.
+
+*/
+      for (int num:nums)      
+            for (int s = target ; s  >= num; s --)
+                  dp[s] = dp[s] || dp[s - num]; 
+            // we populate possible combination if target exist return true;
+            
+      return dp[target];                  
+    
+}
+
+
+public:
+  
+// W = 4, val[] = [1, 2, 3], wt[] = [4, 5, 1]
+int knapsack(int W, vector<int> &val, vector<int> &wt) {
+
+            int n = wt.size();
+
+      vector<vector<int>> dp(n+1,vector<int>(W+1,0));
+
+      for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= W; j++){
+
+                  int pick = 0;
+                  //Can I take this item?     → the item fits in the remaining capacity
+                  if (wt[i-1] < j) //item weight < column
+                        pick = val[i-1] + // value of the current item
+                        dp[i - 1][j - wt[i - 1]] ; ///After taking the item:
+                                                      //* capacity reduces: j → j - wt[i-1]
+                                                      //* you can only use previous items (i-1)
+                              //What is the best value I can get from the remaining capacity using earlier items?
+
+                  int notPick = dp[i - 1][j]; //not picking assuming it doesn't fit 
+
+                  dp[i][j] = max(pick, notPick); //take the maximum of 2 scenarios.
+                  //same as in yotube algoritm 
+            }
+      return dp[n][W];
+}
+
+
+
+      bool canPartition(vector<int>& nums) {
+
+      int target = 0 ;
+      for (int num:nums)
+            target += num;
+
+      if (target % 2 )
+            return false;
+
+      return canPartitionBT (nums, 0 , target / 2 ) ;
+
+    }
+};
+
+
+
+/*
+Input: coins = [1,2,5], amount = 11
+Output: 3
+Explanation: 11 = 5 + 5 + 1
+
+
+dp[x] = minimum coins needed to make amount x
+we search for the best way to make
+dp[0] = 0; 0 coins needed base case
+dp[x] = min(dp[x], 1 + dp[x - coin]);
+
+1 <= coins.length <= 12
+1 <= coins[i] <= 231 - 1
+0 <= amount <= 104
+
+322. Coin Change = minimum coins
+
+ Outer loop = state you are solving
+            I am now solving amount i
+      Inner loop = choices
+            Which coin do I try as the last step?
+
+we want
+👉 Sum outer loop =    
+      I am building all sequences that end at sum s
+
+
+
+      */
+class Solution {
+
+
+public:
+    int     (vector<int>& coins, int amount) {
+     
+            const int INF = amount + 1;
+            vector<int> dp(amount + 1      ,INF ) ; //+1 need to represent amount
+            
+            dp[0] = 0;
+
+            for (int i = 1; i <= amount ; i++ ) // build for all amounts till amount . Forward since we choose 
+                  for (int coin:coins ) // try all coins
+                        if (i - coin >= 0)
+                              dp[i] = min(dp[i], 1 + dp[i- coin]);
+
+      return dp[amount] == INF ? -1 :  dp[amount];
+
+    }
+};
+
+
+
+/*
+Input: amount = 5, coins = [1,2,5]
+Output: 4
+Explanation: there are four ways to make up the amount:
+5=5
+5=2+2+1
+5=2+1+1+1
+5=1+1+1+1+1
+
+518. Coin Change II = number of combinations
+
+we want to build combinations 
+outer loop coin
+I am adding coin types one by one!! . denominations can show multiple times!!
+This forces a fixed order of coin types:
+      use all 1s first
+      then allow 2s
+      then allow 5s
+So 1+2+2 is counted once.
+
+
+dp[s] - number of ways to make sum s
+dp[0] = 1 
+dp[s] +=   dp[s- coin] transition   dp[s- coin] can be dp
+
+
+Outer loop = decision layer (coin types)
+            I am now allowing this coin type
+
+      Inner loop = build sums using this coin
+            Extend existing combinations with this coin
+
+*/
+class Solution {
+public:
+    int change(int amount, vector<int>& coins) {
+
+      vector<long long> dp(amount +1 , 0 );
+
+      int g = coins[0];
+
+      for (int c : coins)
+            g = gcd(g, c);  // greatest common divisor 
+
+      if (amount % g != 0)
+            return 0;
+
+
+      dp[0] = 1;
+      
+      for (int coin:coins)
+            for (int s = 1 ; s <= amount ; s++ )
+                  if (s - coin >= 0)
+                        dp[s] += dp[s-coin]; //every path add its combos s[2] == s[s[1]] + s[0] 1 + 1 for coin 1 and 2 
+             
+
+      return dp[amount];
+    }
+};
+
+
+
+/*
+300. Longest Increasing Subsequence 
+
+state:
+dp[s] - length of the longest increasing subsequence ending at index i
+ 
+transition
+ dp[i] = max(dp[i] ,dp[j] + 1 )  
+if (nums[j] < nums[i])
+
+      Then nums[i] can extend the subsequence ending at j.
+      dp[i ] = dp[i-1] + 1
+else 
+
+ // can nums[i] extend nums[j]?
+ 
+Input: nums = [10,9,2,5,3,7,101,18]
+Output: 4
+Explanation: c is [2,3,7,101], therefore the length is 4.
+
+*/
+
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        
+      int size = nums.size();
+      vector<int> dp(nums.size() +1 , 1);
+
+      int maxLength = 1;
+
+      for (int i = 0 ; i < size; i++){
+            for (int j = 0; j < i; j++)
+                  if (nums[j] < nums[i])
+                        dp[i] = max(dp[i] ,dp[j] + 1 )  ;
+           maxLength = max(maxLength ,dp[i] );
+      }
+
+      return maxLength;
+    }
+};
+
+
+/*
+
+1143. Longest Common Subsequence
+
+
+
+Input: text1 = "abcde", text2 = "ace" 
+Output: 3  
+Explanation: The longest common subsequence is "ace" and its length is 3.
+
+At each pair of prefixes:
+If chars match, take them.
+If not, try skipping one char from either string.
+
+s[i][j] - longest common sequence 
+      At every pair of positions (i, j),
+      what is the best LCS we can build?
+
+If the characters match:
+      text1[i - 1] == text2[j - 1] 
+Then you can extend the previous LCS:
+      dp[i][j] = 1 + dp[i - 1][j - 1];  // Then that character MUST help : 1 + smaller subproblem
+
+If they do not match, you have two choices: 
+      they cannot BOTH appear as the next matched character in the LCS.
+      So one of them is useless for the optimal answer.
+      skip char from text1 OR
+      skip char from text2 
+      try both possibilities
+      take the better answer
+      dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+
+Base case: 
+      If one string is empty:
+      LCS = 0
+
+
+*/
+class Solution {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+      
+      int m = text1.length();
+      int n = text2.length();
+
+      vector<vector<int>> dp(m+1,vector<int>(n+1,0) );
+
+      for (int i = 1; i <= m; i++)
+            for (int j = 1; j <= n; j++){
+
+                  if (text1[i -1] == text2[j-1] )
+                        dp[i][j] = 1 + dp[i-1][j-1];  // they are equal we include them and add subproblem
+                  else
+                        dp[i][j]= max(dp[i - 1][j], dp[i][j - 1]); //populate first row with one's comapring a abcde next row ab
+                        // ab - a when we build the matrix we skip
+
+            }
+
+      return dp[m][n];
+    }
+
+
+/*
+    
+we only need:
+      - previous row
+      - current row left value
+      prevDiag = old dp[i-1][j-1]
+*/
+
+ int longestCommonSubsequence1D(string text1, string text2) {
+      
+            int m = text1.length();
+            int n = text2.length(); 
+
+            vector<int> dp( n + 1 ,0 ); // columns
+
+            for (int i = 1; i <= m; i++){
+                  int prevDiag = 0; // old dp[j-1] from previous row above .  zero every row. coulmn 1 base line
+                  for (int j = 1; j <= n; j++){
+                        
+                        int temp = dp[j]; // old dp[j] before overwrite from previous row above
+                        
+                        if (text1[i -1] == text2[j-1] )
+                              dp[j] = 1 + prevDiag;  
+                        else
+                              dp[j] = max(dp[j], dp[j-1]);  // left item dp[j-1]   = current dp[i][j-1]
+
+                        prevDiag = temp; // this will be diagonal in next iteration 
+                  }
+            }
+            return dp[n];
+ }
+
+};
+
+/*
+Input: word1 = "horse", word2 = "ros"
+Output: 3
+
+Insert a character
+Delete a character
+Replace a character
+
+Explanation: 
+horse -> rorse (replace 'h' with 'r')
+rorse -> rose (remove 'r')
+rose -> ros (remove 'e')
+
+      dp[i][j] = minimum operations to convert word1(target) to word2.
+      minimum edits to convert first i chars of word1 into first j chars of word2. 
+
+      character match - dp[i][j] = dp[i-1][j-1] no operation needed
+      
+      
+      don't match: word1[i-1] != word2[j-1]
+      dp[i][j] = 1 + min({
+
+            dp[i][j-1],     // insert.  add needed character from word  2 adding a word 
+
+            dp[i-1][j],     // delete - shorter word1 go up  
+
+            dp[i-1][j-1]    // replace - we consumed both / both character go back 
+
+      });
+
+      base :
+            empty word1 - dp[i][0] = i // insert all j chars
+            empty word2 - dp[0][j] = j  // delete all i chars
+
+*/
+
+class Solution {
+public:
+    
+      int minDistance(string word1, string word2) {
+  
+      
+            int m = word1.length();
+            int n = word2.length();
+
+            vector<vector<int>> dp(m+1,vector<int>(n+1,0) );
+
+             for (int i = 0; i <= n; i++ )
+                  dp[i][0] = i; 
+
+            for (int j = 0; j <= n; j++ )
+                  dp[0][j] = j; 
+
+    }
+};
+
+/*
+Input: s = "babad"
+Output: "bab"
+Explanation: "aba" is also a valid answer.
+
+A palindrome expands around its center.
+
+There are two types of centers:
+Odd length:  aba
+
+             ^
+
+Even length: abba
+
+             ^^
+
+dp[i][j] - Is substring s[i..j] a palindrome?
+
+1. outer chars match s[i] == s[j]
+2. inside is also palindrome dp[i+1][j-1] - true
+
+s[]
+
+special cases.
+length 1 a
+length 2  aa
+length 3  aba
+
+j - i <= 2 - represnts length indices 
+
+if (s[i] == s[j])
+      if (j - i <= 2 || dp[i+1][j-1] )
+            return true;
+
+
+*/
+
+
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        
+      int length = s.length();;
+      vector<vector<bool>> dp(length,vector<bool>(length,false));
+
+      string result = "";
+      int max = 0;
+
+      // since dp[i][j] depends on: dp[i+1][j-1] we must compute smaller length first
+      //two nested loops doesn't run by length 
+      
+      for (int subLen = 1; subLen <= length; subLen ++)
+            for (int i = 0;  i < length - subLen + 1; i ++){
+                  int j =  i +  subLen  -1 ;
+                  if (s[i] == s[j])
+                         if ( subLen <= 3 || dp[i+1][j-1] ){
+                              dp[i][j] = true;
+                              if (subLen > max ){
+                                    max = subLen;
+                                    result = s.substr(i,subLen);
+                              }
+                        }
+            }
+      return result;
     }
 };
