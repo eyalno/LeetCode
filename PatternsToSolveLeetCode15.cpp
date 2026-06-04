@@ -4091,7 +4091,7 @@ Explanation: The LCA of nodes 5 and 1 is 3.
 	LCA → if already determined below
       */
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
-        longestCommonSubsequence
+        
       if (root == p || root == q || root == nullptr  )
             return root;
 
@@ -4532,7 +4532,7 @@ class Solution {
 
 
 public:
-    int     (vector<int>& coins, int amount) {
+    int     longestCommonSubsequence(vector<int>& coins, int amount) {
      
             const int INF = amount + 1;
             vector<int> dp(amount + 1      ,INF ) ; //+1 need to represent amount
@@ -4872,5 +4872,179 @@ public:
                         }
             }
       return result;
+    }
+};
+/*
+
+Input: s = "bbbab"
+Output: 4
+Explanation: One possible longest palindromic subsequence is "bbbb".
+
+dp[i][j] = longest palindromic subsequence length inside s[i...j]
+
+base case
+dp[i][i] = 1
+
+If the ends match:
+if s[i] == s[j]
+      dp[i][j] = 2 + dp[i+1][j-1]
+
+If they do not match:
+s[i] != s[j]
+
+dp[i][j] = max(dp[i+1][j], dp[i][j-1])
+
+Because dp[i][j] depends on i+1, compute i from right to left:
+important observation
+for (int i = n - 1; i >= 0; i--)
+
+    for (int j = i + 1; j < n; j++)
+filling top right triangle 
+*/
+
+
+class Solution {
+public:
+    int longestPalindromeSubseq(string s) {
+      
+      int length = s.length();
+      vector<vector<int>> dp(length,vector<int>(length,0));
+
+      for (int i = 0; i < length; i++)
+            dp[i][i] = 1;
+
+   
+
+      for (int i = length - 1; i >=0; i--)
+            for (int j = i + 1; j <  length; j++ )      
+                  if (s[i] == s[j]){ //they match 
+                      dp[i][j] = 2 + dp[i+1][j-1];
+                    
+                  }
+                  else
+                      dp[i][j] = max(dp[i+1][j], dp[i][j-1]);
+
+
+      //should represent the max based on previous subproblems - last calculation 
+      return dp[0][length-1]; 
+
+    }
+};
+
+
+/*
+dp[i][j] = number of ways to reach cell (i, j)
+
+dp[0][j] = 1; // first row: only move right
+
+dp[i][0] = 1; // first column: only move down
+
+dp[i][j] = dp[i-1][j] + dp[i][j-1]  
+
+
+
+
+*/
+
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        
+
+      vector<vector<int>> dp(m,vector<int>(n,0));
+
+      for (int i = 0; i < m; i++   )
+            dp[i][0] = 1;
+
+      for (int j = 0; j < n; j++   )
+            dp[0][j] = 1;
+      
+      for (int i = 1; i < m; i++   )
+            for (int j = 1; j < n; j++ )
+                  dp[i][j] =  dp[i-1][j] + dp[i][j-1]  ;
+
+      return dp[m-1][n-1];
+    }
+};
+
+
+
+
+/**
+
+Input: grid = [[1,3,1],[1,5,1],[4,2,1]]
+Output: 7
+Explanation: Because the path 1 → 3 → 1 → 1 → 1 minimizes the sum.
+
+ dp[i][j] - minimum at 
+ 
+ transition 
+
+ dp[i][j] = grid[i][j] + min(dp[i-1][j] ,dp[i][j-1] )
+
+ important: fill base so we have a base to transition 
+
+ */
+
+
+class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+      
+      int m = grid.size();
+      int n = grid[0].size();
+
+      vector<vector<int>> dp (m, vector<int>(n,0));
+
+      dp[0][0] = grid[0][0] ;
+
+
+      for (int i = 1; i < m ; i++ )
+            dp[i][0] = grid[i][0] + dp[i-1][0]  ;
+      
+      for (int j = 1; j < n ; j++ )
+            dp[0][j] = grid[0][j] + dp[0][j-1] ;
+
+      for (int i = 1; i < m; i++)
+            for (int j = 1; j < n; j++)
+                  dp[i][j] = grid[i][j] + min(dp[i-1][j] ,dp[i][j-1] );
+      
+      return dp[m-1][n-1];
+    }
+};
+
+
+/*
+
+dp[m][n] = text and pattern match 
+
+dp[0][0] - true empty string
+
+pattern - "a*" -> ""
+
+
+*/
+
+
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        
+      int m = s.length();
+      int n = p.length();
+
+      vector<vector<bool>> dp(m+1, vector<bool>(n+1,false));
+      dp[0][0] = true;
+
+      for (int j = 2; j <= m; j++) // if star check the dp of previous 
+            if (p[j] == '*')
+                  dp[0][j] = dp[0][j-2];
+
+
+      while 
+      
+
+;
+
     }
 };
