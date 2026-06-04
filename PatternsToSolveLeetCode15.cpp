@@ -4532,7 +4532,7 @@ class Solution {
 
 
 public:
-    int     longestCommonSubsequence(vector<int>& coins, int amount) {
+    int     changeCoins(vector<int>& coins, int amount) {
      
             const int INF = amount + 1;
             vector<int> dp(amount + 1      ,INF ) ; //+1 need to represent amount
@@ -5044,7 +5044,7 @@ public:
       while 
       
 
-;
+
 
     }
 };
